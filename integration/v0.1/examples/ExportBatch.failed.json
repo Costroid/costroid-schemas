@@ -1,0 +1,13 @@
+{
+  "batch_id": "16873409921-2",
+  "installation_id": "github:58120394",
+  "status": "failed",
+  "sha256": "3f7a9c10d2e84b6655a1c0f97e2d4b18c6a35f0e9d7b2c41a8e6f3051d9c7b24",
+  "focus_version": "1.4",
+  "received_at": "2026-10-14T11:24:40Z",
+  "rows": null,
+  "failure": {
+    "code": "EXCESS_NUMERIC_PRECISION",
+    "message": "1 value(s) carry more fractional digits than the store can hold."
+  }
+}

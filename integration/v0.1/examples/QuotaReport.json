@@ -1,0 +1,8 @@
+{
+  "as_of": "2026-10-14T11:20:03Z",
+  "quotas": [
+    { "name": "rows_per_month", "limit": 1000, "used": 820, "state": "approaching", "window_resets_at": "2026-11-01T00:00:00Z" },
+    { "name": "history_days", "limit": null, "used": 14, "state": "ok", "window_resets_at": null },
+    { "name": "exports_per_day", "limit": 200, "used": 12, "state": "ok", "window_resets_at": "2026-10-15T00:00:00Z" }
+  ]
+}

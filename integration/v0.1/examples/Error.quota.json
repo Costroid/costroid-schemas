@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "QUOTA_ROWS_PER_MONTH",
+    "message": "This batch would pass the tenant's rows_per_month limit."
+  }
+}

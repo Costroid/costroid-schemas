@@ -1,0 +1,543 @@
+{
+  "openapi": "3.1.1",
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "info": {
+    "title": "Costroid integration contract",
+    "version": "0.1",
+    "summary": "How Costroid and Costroid Platform identify a tenant, authenticate, move FOCUS rows and report quotas.",
+    "license": { "name": "Apache-2.0", "identifier": "Apache-2.0" }
+  },
+  "servers": [{ "url": "https://app.costroid.com/api/integration/v0.1" }],
+  "security": [{ "integrationToken": [] }],
+  "tags": [
+    { "name": "Identity", "description": "Who a token speaks for." },
+    { "name": "Tokens", "description": "The token in use: read, rotate, revoke." },
+    { "name": "Exports", "description": "FOCUS rows moving from Costroid to Costroid Platform." },
+    { "name": "Quotas", "description": "How much of each limit a tenant has left." }
+  ],
+  "paths": {
+    "/identity": {
+      "get": {
+        "operationId": "getIdentity",
+        "tags": ["Identity"],
+        "summary": "Read the tenant, account and token behind the bearer",
+        "description": "Requires the identity:read scope.",
+        "responses": {
+          "200": {
+            "description": "The identity.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Identity" } }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
+      }
+    },
+    "/installations/{installation_id}": {
+      "parameters": [{ "$ref": "#/components/parameters/InstallationId" }],
+      "put": {
+        "operationId": "bindInstallation",
+        "tags": ["Identity"],
+        "summary": "Bind an SCM installation to the tenant",
+        "description": "Requires the installations:write scope. Binding an installation the tenant already holds answers 200 and changes nothing.",
+        "responses": {
+          "200": {
+            "description": "The installation is bound to this tenant.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Installation" } }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": {
+            "description": "INSTALLATION_BOUND_ELSEWHERE: another tenant holds this installation.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/tokens/current": {
+      "get": {
+        "operationId": "getCurrentToken",
+        "tags": ["Tokens"],
+        "summary": "Read the token in use",
+        "description": "Any scope. The answer never holds the secret.",
+        "responses": {
+          "200": {
+            "description": "The token's metadata.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Token" } }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      },
+      "delete": {
+        "operationId": "revokeCurrentToken",
+        "tags": ["Tokens"],
+        "summary": "Revoke the token in use",
+        "description": "Any scope. Effective at once.",
+        "responses": {
+          "204": { "description": "The token is revoked." },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/tokens/current/rotate": {
+      "post": {
+        "operationId": "rotateCurrentToken",
+        "tags": ["Tokens"],
+        "summary": "Replace the token in use",
+        "description": "Any scope. The answer holds the new secret once. The old token keeps working until previous_token_expires_at.",
+        "responses": {
+          "200": {
+            "description": "The new token.",
+            "headers": { "Cache-Control": { "$ref": "#/components/headers/NoStore" } },
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/TokenRotation" } }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/exports/{batch_id}": {
+      "parameters": [{ "$ref": "#/components/parameters/BatchId" }],
+      "put": {
+        "operationId": "putExportBatch",
+        "tags": ["Exports"],
+        "summary": "Send one batch of rows",
+        "description": "Requires the rows:write scope. The body is a FOCUS row CSV as focus-row/v0.1 defines it. The tenant comes from the token and never from the body. A new batch_id adds rows. The same batch_id with different bytes replaces that batch once the new bytes have ingested. The same batch_id with the same bytes answers 200 and changes nothing. A batch ingests whole or fails whole.",
+        "parameters": [
+          { "$ref": "#/components/parameters/InstallationHeader" },
+          { "$ref": "#/components/parameters/ContentSha256" },
+          { "$ref": "#/components/parameters/FocusVersion" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "text/csv": {
+              "schema": {
+                "type": "string",
+                "description": "UTF-8 CSV with one header row, as focus-row/v0.1 defines it."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "These bytes are already held under this batch_id.",
+            "headers": { "Costroid-Quota-State": { "$ref": "#/components/headers/QuotaState" } },
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ExportBatch" } }
+            }
+          },
+          "202": {
+            "description": "The batch is accepted for ingest. Read its verdict from GET /exports/{batch_id}.",
+            "headers": { "Costroid-Quota-State": { "$ref": "#/components/headers/QuotaState" } },
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ExportBatch" } }
+            }
+          },
+          "400": {
+            "description": "A header is missing or malformed.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": {
+            "description": "INSTALLATION_NOT_BOUND: the installation is not bound to this tenant. EXPORT_BATCH_BUSY: this batch_id has an ingest in flight.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "413": {
+            "description": "FILE_TOO_LARGE: the body exceeds max_batch_bytes.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "422": {
+            "description": "HASH_MISMATCH: the body does not hash to Costroid-Content-SHA256.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "429": { "$ref": "#/components/responses/QuotaExhausted" }
+        }
+      },
+      "get": {
+        "operationId": "getExportBatch",
+        "tags": ["Exports"],
+        "summary": "Read one batch's verdict",
+        "description": "Requires the rows:write scope.",
+        "responses": {
+          "200": {
+            "description": "The batch.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ExportBatch" } }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": {
+            "description": "EXPORT_BATCH_NOT_FOUND: this tenant holds no such batch.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/quotas": {
+      "get": {
+        "operationId": "getQuotas",
+        "tags": ["Quotas"],
+        "summary": "Read every quota signal for the tenant",
+        "description": "Requires the quotas:read scope.",
+        "responses": {
+          "200": {
+            "description": "The signals.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/QuotaReport" } }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "integrationToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "An integration token. See README.md, section Tokens."
+      }
+    },
+    "parameters": {
+      "InstallationId": {
+        "name": "installation_id",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/InstallationId" }
+      },
+      "BatchId": {
+        "name": "batch_id",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/BatchId" }
+      },
+      "InstallationHeader": {
+        "name": "Costroid-Installation-Id",
+        "in": "header",
+        "required": true,
+        "description": "The bound installation these rows came through.",
+        "schema": { "$ref": "#/components/schemas/InstallationId" }
+      },
+      "ContentSha256": {
+        "name": "Costroid-Content-SHA256",
+        "in": "header",
+        "required": true,
+        "description": "The SHA-256 of the body in lower-case hexadecimal.",
+        "schema": { "$ref": "#/components/schemas/Sha256" }
+      },
+      "FocusVersion": {
+        "name": "Costroid-Focus-Version",
+        "in": "header",
+        "required": true,
+        "description": "The FOCUS version the rows declare.",
+        "schema": { "const": "1.4" }
+      }
+    },
+    "headers": {
+      "QuotaState": {
+        "description": "The most urgent state across the tenant's quotas after this request.",
+        "schema": { "$ref": "#/components/schemas/QuotaState" }
+      },
+      "NoStore": {
+        "description": "The answer holds a secret and is never cached.",
+        "schema": { "const": "no-store" }
+      },
+      "RetryAfter": {
+        "description": "Seconds until the refused request can succeed.",
+        "schema": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "AUTH_TOKEN_INVALID: the token is absent, unknown, expired or revoked. The four cases answer alike.",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "Forbidden": {
+        "description": "AUTH_TOKEN_SCOPE: the token lacks the scope this operation names.",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "QuotaExhausted": {
+        "description": "The request would pass a quota's limit. The error code is the quota's name in upper case, prefixed QUOTA_. Nothing was stored.",
+        "headers": {
+          "Retry-After": { "$ref": "#/components/headers/RetryAfter" },
+          "Costroid-Quota-State": { "$ref": "#/components/headers/QuotaState" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      }
+    },
+    "schemas": {
+      "TagSet": {
+        "description": "The tag set, by reference. Rows carry it in their Tags column.",
+        "$ref": "../../tags/v0.1/tags.schema.json"
+      },
+      "FocusRow": {
+        "description": "The row, by reference.",
+        "$ref": "../../focus-row/v0.1/row.schema.json"
+      },
+      "Timestamp": {
+        "type": "string",
+        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+      },
+      "Sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+      "ResourceId": { "type": "string", "pattern": "^[A-Za-z0-9_-]{1,64}$" },
+      "BatchId": {
+        "description": "Chosen by the sender and unique within the tenant. A retry of one batch reuses its id.",
+        "type": "string",
+        "pattern": "^[A-Za-z0-9._-]{1,128}$"
+      },
+      "InstallationId": {
+        "description": "The SCM's name, a colon and the SCM's own id for the installation.",
+        "type": "string",
+        "pattern": "^(github|gitlab|azure-devops):[A-Za-z0-9._-]{1,128}$"
+      },
+      "Scope": {
+        "enum": ["identity:read", "installations:write", "rows:write", "quotas:read"]
+      },
+      "Tenant": {
+        "description": "An organization. Costroid and Costroid Platform share it.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "region"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/ResourceId" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 256 },
+          "region": {
+            "description": "Fixed at sign-up.",
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          }
+        }
+      },
+      "Account": {
+        "description": "The person who issued the token, by id. No address leaves through this contract.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "role"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/ResourceId" },
+          "role": { "enum": ["admin", "member"] }
+        }
+      },
+      "Token": {
+        "description": "A token's metadata. Never the secret.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "scopes", "created_at", "expires_at", "last_used_at"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/ResourceId" },
+          "scopes": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "$ref": "#/components/schemas/Scope" }
+          },
+          "created_at": { "$ref": "#/components/schemas/Timestamp" },
+          "expires_at": { "$ref": "#/components/schemas/Timestamp" },
+          "last_used_at": {
+            "oneOf": [{ "$ref": "#/components/schemas/Timestamp" }, { "type": "null" }]
+          }
+        }
+      },
+      "TokenRotation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["secret", "token", "previous_token_expires_at"],
+        "properties": {
+          "secret": {
+            "description": "Shown once.",
+            "type": "string",
+            "pattern": "^costroid_it_[A-Za-z0-9_-]{43}$"
+          },
+          "token": { "$ref": "#/components/schemas/Token" },
+          "previous_token_expires_at": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "Installation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "tenant_id", "bound_at"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/InstallationId" },
+          "tenant_id": { "$ref": "#/components/schemas/ResourceId" },
+          "bound_at": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "Contract": {
+        "description": "The versions this server speaks.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["version", "tag_set", "focus_row"],
+        "properties": {
+          "version": { "const": "0.1" },
+          "tag_set": { "const": "tags/v0.1" },
+          "focus_row": { "const": "focus-row/v0.1" }
+        }
+      },
+      "Identity": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["contract", "tenant", "account", "token", "installations"],
+        "properties": {
+          "contract": { "$ref": "#/components/schemas/Contract" },
+          "tenant": { "$ref": "#/components/schemas/Tenant" },
+          "account": { "$ref": "#/components/schemas/Account" },
+          "token": { "$ref": "#/components/schemas/Token" },
+          "installations": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Installation" }
+          }
+        }
+      },
+      "ExportStatus": {
+        "enum": ["accepted", "ingesting", "ingested", "failed"]
+      },
+      "ExportFailure": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "message"],
+        "properties": {
+          "code": {
+            "description": "Stable. A client treats a code it does not know as a failed batch.",
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
+          "message": { "type": "string" }
+        }
+      },
+      "ExportBatch": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "installation_id",
+          "status",
+          "sha256",
+          "focus_version",
+          "received_at",
+          "rows",
+          "failure"
+        ],
+        "properties": {
+          "batch_id": { "$ref": "#/components/schemas/BatchId" },
+          "installation_id": { "$ref": "#/components/schemas/InstallationId" },
+          "status": { "$ref": "#/components/schemas/ExportStatus" },
+          "sha256": { "$ref": "#/components/schemas/Sha256" },
+          "focus_version": { "const": "1.4" },
+          "received_at": { "$ref": "#/components/schemas/Timestamp" },
+          "rows": {
+            "description": "Null until the batch has ingested.",
+            "type": ["integer", "null"],
+            "minimum": 1
+          },
+          "failure": {
+            "description": "Null unless status is failed.",
+            "oneOf": [{ "$ref": "#/components/schemas/ExportFailure" }, { "type": "null" }]
+          }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "status": { "const": "ingested" } } },
+            "then": {
+              "properties": { "rows": { "type": "integer" }, "failure": { "type": "null" } }
+            }
+          },
+          {
+            "if": { "properties": { "status": { "const": "failed" } } },
+            "then": {
+              "properties": { "rows": { "type": "null" }, "failure": { "type": "object" } }
+            }
+          },
+          {
+            "if": { "properties": { "status": { "enum": ["accepted", "ingesting"] } } },
+            "then": { "properties": { "rows": { "type": "null" }, "failure": { "type": "null" } } }
+          }
+        ]
+      },
+      "QuotaName": {
+        "enum": [
+          "rows_per_month",
+          "history_days",
+          "members",
+          "exports_per_day",
+          "export_bytes_per_day",
+          "max_batch_bytes"
+        ]
+      },
+      "QuotaState": {
+        "description": "ok, approaching at 80% of the limit, or exhausted.",
+        "enum": ["ok", "approaching", "exhausted"]
+      },
+      "QuotaSignal": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "limit", "used", "state", "window_resets_at"],
+        "properties": {
+          "name": { "$ref": "#/components/schemas/QuotaName" },
+          "limit": {
+            "description": "Null means no limit applies to this tenant.",
+            "type": ["integer", "null"],
+            "minimum": 0
+          },
+          "used": { "type": "integer", "minimum": 0 },
+          "state": { "$ref": "#/components/schemas/QuotaState" },
+          "window_resets_at": {
+            "description": "Null for a limit with no window.",
+            "oneOf": [{ "$ref": "#/components/schemas/Timestamp" }, { "type": "null" }]
+          }
+        }
+      },
+      "QuotaReport": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["as_of", "quotas"],
+        "properties": {
+          "as_of": { "$ref": "#/components/schemas/Timestamp" },
+          "quotas": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/QuotaSignal" }
+          }
+        }
+      },
+      "Error": {
+        "description": "Every refusal. The code is the contract, the message is for people.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["code", "message"],
+            "properties": {
+              "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
