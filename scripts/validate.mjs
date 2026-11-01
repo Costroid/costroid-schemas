@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { createHash } from 'node:crypto'
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs'
 import { basename, dirname, extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -115,8 +116,20 @@ function productEquals(left, right, expected) {
   )
 }
 
-function focusRowProblems(row) {
+function rowIdProblem(row, requestIds) {
+  const requestId = requestIds[row.Tags['costroid/cost_source']]
+  if (requestId === undefined)
+    return `no request id names cost source ${row.Tags['costroid/cost_source']}`
+  const expected = createHash('sha256').update(`${requestId}:${row.SkuMeter}`).digest('hex')
+  return row.x_CostroidRowId === expected
+    ? undefined
+    : `x_CostroidRowId is not the SHA-256 of ${requestId}:${row.SkuMeter}`
+}
+
+function focusRowProblems(row, requestIds) {
   const problems = []
+  const rowId = rowIdProblem(row, requestIds)
+  if (rowId !== undefined) problems.push(rowId)
   if (!productEquals(row.ListUnitPrice, row.PricingQuantity, row.ListCost))
     problems.push('ListCost is not ListUnitPrice times PricingQuantity')
   if (!productEquals(row.ContractedUnitPrice, row.PricingQuantity, row.ContractedCost))
@@ -134,23 +147,27 @@ const describeErrors = (errors) =>
     .map((error) => `${error.instancePath || '/'} ${error.message}`)
     .join('; ')
 
-function problemsWith(validate, path, contract) {
+function problemsWith(validate, path, contract, requestIds) {
   const problems = []
   for (const [index, instance] of instancesOf(path).entries()) {
     if (!validate(instance)) problems.push(`item ${index + 1}: ${describeErrors(validate.errors)}`)
     else if (contract === 'focus-row')
-      problems.push(...focusRowProblems(instance).map((problem) => `item ${index + 1}: ${problem}`))
+      problems.push(
+        ...focusRowProblems(instance, requestIds).map((problem) => `item ${index + 1}: ${problem}`),
+      )
   }
   return problems
 }
 
 function checkExamples(directory, validatorFor) {
   const contract = basename(dirname(directory))
+  const requestIds =
+    contract === 'focus-row' ? readJson(join(directory, 'examples-request-ids.json')) : undefined
   const accepted = exampleFiles(join(directory, 'examples'))
   if (accepted.length === 0) report(directory, 'no examples')
   for (const path of accepted) {
     try {
-      const problems = problemsWith(validatorFor(path), path, contract)
+      const problems = problemsWith(validatorFor(path), path, contract, requestIds)
       if (problems.length > 0) report(path, problems.join(' | '))
       else pass(path, 'accepted')
     } catch (error) {
@@ -159,7 +176,7 @@ function checkExamples(directory, validatorFor) {
   }
   for (const path of exampleFiles(join(directory, 'examples', 'rejected'))) {
     try {
-      const problems = problemsWith(validatorFor(path), path, contract)
+      const problems = problemsWith(validatorFor(path), path, contract, requestIds)
       if (problems.length === 0) report(path, 'a rejected example was accepted')
       else pass(path, `rejected: ${problems[0]}`)
     } catch (error) {

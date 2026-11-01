@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/Costroid/costroid-schemas/main/tags/v0.1/tags.schema.json",
   "title": "Costroid per-PR tag set, version 0.1",
-  "description": "The value of the FOCUS Tags column on a Costroid row. Every Costroid key carries the costroid/ prefix. Keys without the prefix are user-defined tags and pass through.",
+  "description": "The value of the FOCUS Tags column on a Costroid row. Every Costroid key carries the costroid/ prefix. Keys without the prefix are user-defined tags and pass through, except on the hosted ingest path, costroid serve, which drops them and counts them by name.",
   "type": "object",
   "properties": {
     "costroid/repo": {
@@ -48,7 +48,7 @@
       "pattern": "^[A-Za-z0-9._:/@-]{1,128}$"
     },
     "costroid/cost_source": {
-      "description": "What produced the figure. Open by design: agent_stream, otlp and provider_report are defined here, and an adapter names itself.",
+      "description": "What produced the figure. Open by design: agent_stream, agent_session_file, otlp and provider_report are defined here, and an adapter names itself.",
       "type": "string",
       "pattern": "^[a-z0-9]+([_-][a-z0-9]+)*$",
       "maxLength": 64

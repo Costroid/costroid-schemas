@@ -10,7 +10,7 @@ Every key starts with `costroid/`.
 
 FOCUS 1.4 requires a provider-defined tag key to carry "a predetermined, provider-specified tag key prefix" and says that prefix should be publicly documented ([Tags, FOCUS 1.4](https://github.com/FinOps-Open-Cost-and-Usage-Spec/FOCUS_Spec/blob/v1.4/specification/datasets/cost_and_usage/columns/tags.md), retrieved 2026-11-01). This section is that documentation. The slash follows the example in the same document.
 
-The prefix is reserved. A key under `costroid/` that this version does not define is rejected. A key without the prefix is a user-defined tag and passes through, with a string, number, boolean or null value.
+The prefix is reserved. A key under `costroid/` that this version does not define is rejected. A key without the prefix is a user-defined tag and passes through, with a string, number, boolean or null value. The hosted ingest path, `costroid serve`, is the exception. It drops every key outside the prefix before storage and counts it by name, because a free-form key and value are where content would hide.
 
 A proposal to FOCUS for a neutral prefix would be a new version of this convention.
 
@@ -34,7 +34,7 @@ Every value is a string. A tag with no value is omitted, never written as null o
 | `costroid/enforcement_grade` | every row                   | Closed, below                                           |
 | `costroid/run_identity`      | every row                   | Closed, below                                           |
 
-`costroid/cost_source` is open, because the ledger does not know what kind of cost a row carries. This version defines `agent_stream` (the wrapper read the agent's own result stream), `otlp` (the OTLP endpoint) and `provider_report` (the provider's usage or cost report). An adapter names itself.
+`costroid/cost_source` is open, because the ledger does not know what kind of cost a row carries. This version defines `agent_stream` (the wrapper read the agent's own result stream), `agent_session_file` (the wrapper read the session or rollout file the agent wrote), `otlp` (the OTLP endpoint) and `provider_report` (the provider's usage or cost report). An adapter names itself.
 
 ## Closed vocabularies
 

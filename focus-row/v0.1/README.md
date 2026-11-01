@@ -35,7 +35,7 @@ The row carries the 21 columns FOCUS 1.4 makes mandatory, the conditional column
 | `PricingQuantity`, `PricingUnit`         | Tokens divided by 1000000, and `1000000 Tokens`                                       |
 | `ConsumedQuantity`, `ConsumedUnit`       | The token count and `Tokens`, or the vendor's credit count and `Credits`              |
 | `Tags`                                   | The [tag set](../../tags/v0.1/README.md), serialized as JSON in CSV                   |
-| `x_CostroidRowId`                        | SHA-256 of the provider's request id and the token class                              |
+| `x_CostroidRowId`                        | SHA-256 of `<request id>:<token class>`. See [Row ids](#row-ids)                      |
 | `x_CostroidCatalogVersion`               | The catalog version that priced the row. Required on `measured` and `list_equivalent` |
 | `x_CostroidOvershootBound`               | Concurrency times `max_tokens` times price. Required on `gateway-precheck`            |
 
@@ -78,6 +78,12 @@ FOCUS 1.4 says EffectiveCost "MUST equal BilledCost when ChargeCategory is "Usag
 A `measured`, `billed` or `derived` row breaks that sentence. Its `BilledCost` is 0 and its `EffectiveCost` is not. The row states a cost the ledger measured, and the only column FOCUS keeps for an incurred cost that is not an invoice line is `EffectiveCost`.
 
 A reader merging these rows with the provider's own FOCUS data must not add the two `EffectiveCost` sums. `costroid/cost_source` tells the rows apart.
+
+## Row ids
+
+`x_CostroidRowId` is the lower-case hexadecimal SHA-256 of the UTF-8 text `<request id>:<token class>`, joined by one colon. The token class is the row's `SkuMeter`. The request id is the provider's. An agent that reports none gets a stand-in from its adapter, which the adapter documents.
+
+`examples-request-ids.json` names the synthetic request id behind each example row, by its `costroid/cost_source`. `validate.mjs` recomputes `x_CostroidRowId` from it on every row that passes the schema. The first row of `examples/request-rows.csv` hashes the text `req_example_0001:input_uncached`. `examples/rejected/row-id-without-the-colon.json` is the same row hashed without the colon.
 
 ## Numbers
 

@@ -113,7 +113,7 @@
       "oneOf": [{ "$ref": "#/$defs/nonNegativeDecimal" }, { "type": "null" }]
     },
     "x_CostroidRowId": {
-      "description": "SHA-256 of the provider's request identifier and the token class, in lower-case hexadecimal.",
+      "description": "SHA-256 of the UTF-8 text <request id>:<token class>, in lower-case hexadecimal. The request id is the provider's, or the adapter's stated stand-in when the agent reports none.",
       "type": "string",
       "pattern": "^[0-9a-f]{64}$"
     }
