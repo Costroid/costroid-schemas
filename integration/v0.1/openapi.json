@@ -39,21 +39,163 @@
       "put": {
         "operationId": "bindInstallation",
         "tags": ["Identity"],
-        "summary": "Bind an SCM installation to the tenant",
-        "description": "Requires the installations:write scope. Binding an installation the tenant already holds answers 200 and changes nothing.",
+        "summary": "Bind an SCM owner to the tenant with a proof",
+        "description": "Requires the installations:write scope. The body carries a CI proof or an App attestation, and README.md, section Identity, states the rules. A tenant that holds this installation answers 200 even when the proof has expired, and only a valid newer proof moves proven_at. A refused proof changes nothing. The platform reads who holds the owner only after the proof passes, so INSTALLATION_BOUND_ELSEWHERE reaches only a caller with a valid proof. A binding never moves rows between tenants.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InstallationBinding" },
+              "examples": {
+                "ciProof": {
+                  "summary": "A GitHub Actions ID token",
+                  "externalValue": "examples/InstallationBinding.ci-proof.json"
+                },
+                "appAttestation": {
+                  "summary": "An attestation signed by Costroid's hosted service",
+                  "externalValue": "examples/InstallationBinding.app-attestation.json"
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "The installation is bound to this tenant.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Installation" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Installation" },
+                "examples": {
+                  "ciProof": {
+                    "summary": "Bound by a CI proof",
+                    "externalValue": "examples/Installation.ci-proof.json"
+                  },
+                  "appAttestation": {
+                    "summary": "Bound by an App attestation",
+                    "externalValue": "examples/Installation.app-attestation.json"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "INSTALLATION_PROOF_MISSING: the body holds no proof, or the proof is not a compact JWS.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InstallationRefusal" },
+                "examples": {
+                  "INSTALLATION_PROOF_MISSING": {
+                    "summary": "No proof in the body",
+                    "externalValue": "examples/InstallationRefusal.INSTALLATION_PROOF_MISSING.json"
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": {
+            "description": "AUTH_TOKEN_SCOPE: the token lacks the scope this operation names. The other codes refuse the proof. INSTALLATION_PROOF_ISSUER_UNTRUSTED: its issuer is not a trusted one. INSTALLATION_PROOF_SIGNATURE_INVALID: its algorithm is not RS256, its key id is unknown or its signature fails. INSTALLATION_PROOF_AUDIENCE_MISMATCH: its audience is not this tenant's. INSTALLATION_PROOF_EXPIRED: it is past exp, more than 600 seconds past iat, or issued before the installation's last change. INSTALLATION_PROOF_CLAIMS_INVALID: a required stable id is absent or not a number. INSTALLATION_PROOF_UNPROTECTED_RUN: the run could start without passing the owner's protected branch. INSTALLATION_PROOF_SUBJECT_MISMATCH: it proves another installation than the path names.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "INSTALLATION_PROOF_ISSUER_UNTRUSTED": {
+                    "summary": "A self-hosted service or a self-managed SCM signed it",
+                    "externalValue": "examples/InstallationRefusal.INSTALLATION_PROOF_ISSUER_UNTRUSTED.json"
+                  },
+                  "INSTALLATION_PROOF_SIGNATURE_INVALID": {
+                    "summary": "The signature fails",
+                    "externalValue": "examples/InstallationRefusal.INSTALLATION_PROOF_SIGNATURE_INVALID.json"
+                  },
+                  "INSTALLATION_PROOF_AUDIENCE_MISMATCH": {
+                    "summary": "The proof names another tenant",
+                    "externalValue": "examples/InstallationRefusal.INSTALLATION_PROOF_AUDIENCE_MISMATCH.json"
+                  },
+                  "INSTALLATION_PROOF_EXPIRED": {
+                    "summary": "The window has passed",
+                    "externalValue": "examples/InstallationRefusal.INSTALLATION_PROOF_EXPIRED.json"
+                  },
+                  "INSTALLATION_PROOF_CLAIMS_INVALID": {
+                    "summary": "The proof holds names and no stable id",
+                    "externalValue": "examples/InstallationRefusal.INSTALLATION_PROOF_CLAIMS_INVALID.json"
+                  },
+                  "INSTALLATION_PROOF_UNPROTECTED_RUN": {
+                    "summary": "A run outside the protected branch",
+                    "externalValue": "examples/InstallationRefusal.INSTALLATION_PROOF_UNPROTECTED_RUN.json"
+                  },
+                  "INSTALLATION_PROOF_SUBJECT_MISMATCH": {
+                    "summary": "The proof names another owner",
+                    "externalValue": "examples/InstallationRefusal.INSTALLATION_PROOF_SUBJECT_MISMATCH.json"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "INSTALLATION_BOUND_ELSEWHERE: the proof is valid and another tenant holds this owner under a rule the proof does not beat.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InstallationRefusal" },
+                "examples": {
+                  "INSTALLATION_BOUND_ELSEWHERE": {
+                    "summary": "Another tenant holds the owner",
+                    "externalValue": "examples/InstallationRefusal.INSTALLATION_BOUND_ELSEWHERE.json"
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "INSTALLATION_PROOF_KEYS_UNAVAILABLE: the issuer's key set cannot be read. Nothing was judged, and the same proof can be retried inside its window.",
+            "headers": { "Retry-After": { "$ref": "#/components/headers/RetryAfter" } },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InstallationRefusal" },
+                "examples": {
+                  "INSTALLATION_PROOF_KEYS_UNAVAILABLE": {
+                    "summary": "The key set cannot be read",
+                    "externalValue": "examples/InstallationRefusal.INSTALLATION_PROOF_KEYS_UNAVAILABLE.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "unbindInstallation",
+        "tags": ["Identity"],
+        "summary": "End the tenant's own binding",
+        "description": "Requires the installations:write scope. The binding ends as revoked and needs no proof, because a tenant can always give up what it holds. Costroid's hosted service calls this when GitHub reports the App uninstalled or suspended. The tenant keeps its rows. A repeat answers 200 and changes nothing.",
+        "responses": {
+          "200": {
+            "description": "The binding has ended.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Installation" },
+                "examples": {
+                  "revoked": {
+                    "summary": "Revoked after an uninstall",
+                    "externalValue": "examples/Installation.revoked.json"
+                  }
+                }
+              }
             }
           },
           "401": { "$ref": "#/components/responses/Unauthorized" },
           "403": { "$ref": "#/components/responses/Forbidden" },
           "409": {
-            "description": "INSTALLATION_BOUND_ELSEWHERE: another tenant holds this installation.",
+            "description": "INSTALLATION_NOT_BOUND: this tenant never held this installation.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "INSTALLATION_NOT_BOUND": {
+                    "summary": "This tenant never held the installation",
+                    "externalValue": "examples/Error.installation-not-bound.json"
+                  }
+                }
+              }
             }
           }
         }
@@ -151,7 +293,7 @@
           "401": { "$ref": "#/components/responses/Unauthorized" },
           "403": { "$ref": "#/components/responses/Forbidden" },
           "409": {
-            "description": "INSTALLATION_NOT_BOUND: the installation is not bound to this tenant. EXPORT_BATCH_BUSY: this batch_id has an ingest in flight.",
+            "description": "INSTALLATION_NOT_BOUND: this tenant holds no active binding of the installation, including one that was revoked or displaced. EXPORT_BATCH_BUSY: this batch_id has an ingest in flight.",
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
             }
@@ -238,7 +380,7 @@
         "name": "Costroid-Installation-Id",
         "in": "header",
         "required": true,
-        "description": "The bound installation these rows came through.",
+        "description": "The installation these rows came through, held active by this tenant.",
         "schema": { "$ref": "#/components/schemas/InstallationId" }
       },
       "ContentSha256": {
@@ -309,9 +451,133 @@
         "pattern": "^[A-Za-z0-9._-]{1,128}$"
       },
       "InstallationId": {
-        "description": "The SCM's name, a colon and the SCM's own id for the installation.",
+        "description": "The kind, a colon and the SCM's numeric id. github is a GitHub App installation. github-owner is the repository_owner_id of an account that runs only the Action. gitlab-namespace is a GitLab.com namespace_id. A name is never an id.",
         "type": "string",
-        "pattern": "^(github|gitlab|azure-devops):[A-Za-z0-9._-]{1,128}$"
+        "pattern": "^(github|github-owner|gitlab-namespace):[1-9][0-9]{0,19}$"
+      },
+      "NumericId": {
+        "description": "An SCM's id for an owner, repository or project. Both SCMs state it as a string of digits.",
+        "type": "string",
+        "pattern": "^[1-9][0-9]{0,19}$"
+      },
+      "UnixTime": { "type": "integer", "minimum": 0 },
+      "CompactJws": {
+        "description": "Three base64url segments. RS256 only.",
+        "type": "string",
+        "maxLength": 16384,
+        "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$"
+      },
+      "ProofAudience": {
+        "description": "The tenant the proof is for, as https://app.costroid.com/tenants/ and the tenant id. It must equal the audience of the tenant behind the bearer. One string, never a list.",
+        "type": "string",
+        "pattern": "^https://app\\.costroid\\.com/tenants/[A-Za-z0-9_-]{1,64}$"
+      },
+      "ProofHeader": {
+        "description": "The decoded JOSE header of a proof. One algorithm, so a verifier has one path.",
+        "type": "object",
+        "required": ["alg", "kid"],
+        "properties": {
+          "alg": { "const": "RS256" },
+          "kid": { "type": "string", "minLength": 1, "maxLength": 256 }
+        }
+      },
+      "GitHubCiClaims": {
+        "description": "The decoded payload of a CI proof from GitHub Actions. Other claims are ignored and not stored. repository_owner and repository are names, and they prove nothing.",
+        "type": "object",
+        "required": [
+          "iss",
+          "aud",
+          "iat",
+          "exp",
+          "repository_owner_id",
+          "repository_id",
+          "event_name"
+        ],
+        "properties": {
+          "iss": { "const": "https://token.actions.githubusercontent.com" },
+          "aud": { "$ref": "#/components/schemas/ProofAudience" },
+          "iat": { "$ref": "#/components/schemas/UnixTime" },
+          "exp": { "$ref": "#/components/schemas/UnixTime" },
+          "repository_owner_id": { "$ref": "#/components/schemas/NumericId" },
+          "repository_id": { "$ref": "#/components/schemas/NumericId" },
+          "event_name": {
+            "description": "A schedule runs only on the default branch. A push counts only on a protected ref. Every other event is refused.",
+            "enum": ["schedule", "push"]
+          },
+          "ref_protected": {
+            "description": "Read only for a push. Assumed to be a string, like every other GitHub claim: no real token has been read.",
+            "type": "string"
+          }
+        },
+        "if": { "properties": { "event_name": { "const": "push" } } },
+        "then": {
+          "required": ["ref_protected"],
+          "properties": { "ref_protected": { "const": "true" } }
+        }
+      },
+      "GitLabCiClaims": {
+        "description": "The decoded payload of a CI proof from GitLab.com. Other claims are ignored and not stored. namespace_path and project_path are names, and they prove nothing.",
+        "type": "object",
+        "required": [
+          "iss",
+          "aud",
+          "iat",
+          "exp",
+          "namespace_id",
+          "project_id",
+          "ref_protected",
+          "pipeline_source"
+        ],
+        "properties": {
+          "iss": { "const": "https://gitlab.com" },
+          "aud": { "$ref": "#/components/schemas/ProofAudience" },
+          "iat": { "$ref": "#/components/schemas/UnixTime" },
+          "exp": { "$ref": "#/components/schemas/UnixTime" },
+          "namespace_id": { "$ref": "#/components/schemas/NumericId" },
+          "project_id": { "$ref": "#/components/schemas/NumericId" },
+          "ref_protected": { "const": "true" },
+          "pipeline_source": { "enum": ["push", "web", "schedule"] }
+        }
+      },
+      "AttestationClaims": {
+        "description": "The decoded payload of an App attestation, signed by Costroid's hosted service.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["iss", "aud", "sub", "owner_id", "delivery", "iat", "exp"],
+        "properties": {
+          "iss": { "const": "https://app.costroid.com/installation-attestation" },
+          "aud": { "$ref": "#/components/schemas/ProofAudience" },
+          "sub": {
+            "description": "The installation.",
+            "type": "string",
+            "pattern": "^github:[1-9][0-9]{0,19}$"
+          },
+          "owner_id": {
+            "description": "The id of the account the App is installed on.",
+            "$ref": "#/components/schemas/NumericId"
+          },
+          "delivery": {
+            "description": "The id of the signed GitHub delivery behind this attestation.",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9-]{1,64}$"
+          },
+          "iat": { "$ref": "#/components/schemas/UnixTime" },
+          "exp": { "$ref": "#/components/schemas/UnixTime" }
+        }
+      },
+      "InstallationBinding": {
+        "description": "The body of PUT /installations/{installation_id}. The proof's signed claims name the installation and the tenant. The proof is never stored and never logged.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["proof"],
+        "properties": {
+          "proof": { "$ref": "#/components/schemas/CompactJws" }
+        }
+      },
+      "ProofKind": { "enum": ["app_attestation", "ci_oidc"] },
+      "InstallationStatus": {
+        "description": "active: this tenant holds the owner. revoked: the binding was given up, or the App was uninstalled or suspended. displaced: a stated rule gave the owner to another tenant.",
+        "enum": ["active", "revoked", "displaced"]
       },
       "Scope": {
         "enum": ["identity:read", "installations:write", "rows:write", "quotas:read"]
@@ -376,14 +642,41 @@
         }
       },
       "Installation": {
+        "description": "One binding. An ended binding stays listed, because the tenant's rows still name it.",
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "tenant_id", "bound_at"],
+        "required": [
+          "id",
+          "tenant_id",
+          "owner_id",
+          "status",
+          "proof_kind",
+          "bound_at",
+          "proven_at",
+          "ended_at"
+        ],
         "properties": {
           "id": { "$ref": "#/components/schemas/InstallationId" },
           "tenant_id": { "$ref": "#/components/schemas/ResourceId" },
-          "bound_at": { "$ref": "#/components/schemas/Timestamp" }
-        }
+          "owner_id": {
+            "description": "The SCM's id for the owner. One owner belongs to one tenant at a time, across every kind of id.",
+            "$ref": "#/components/schemas/NumericId"
+          },
+          "status": { "$ref": "#/components/schemas/InstallationStatus" },
+          "proof_kind": { "$ref": "#/components/schemas/ProofKind" },
+          "bound_at": { "$ref": "#/components/schemas/Timestamp" },
+          "proven_at": {
+            "description": "The issue time of the newest proof accepted for this binding.",
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "ended_at": {
+            "description": "Null while the binding is active.",
+            "oneOf": [{ "$ref": "#/components/schemas/Timestamp" }, { "type": "null" }]
+          }
+        },
+        "if": { "properties": { "status": { "const": "active" } } },
+        "then": { "properties": { "ended_at": { "type": "null" } } },
+        "else": { "properties": { "ended_at": { "type": "string" } } }
       },
       "Contract": {
         "description": "The versions this server speaks.",
@@ -536,6 +829,87 @@
               "message": { "type": "string" }
             }
           }
+        }
+      },
+      "InstallationRefusalCode": {
+        "enum": [
+          "INSTALLATION_PROOF_MISSING",
+          "INSTALLATION_PROOF_ISSUER_UNTRUSTED",
+          "INSTALLATION_PROOF_SIGNATURE_INVALID",
+          "INSTALLATION_PROOF_AUDIENCE_MISMATCH",
+          "INSTALLATION_PROOF_EXPIRED",
+          "INSTALLATION_PROOF_CLAIMS_INVALID",
+          "INSTALLATION_PROOF_UNPROTECTED_RUN",
+          "INSTALLATION_PROOF_SUBJECT_MISMATCH",
+          "INSTALLATION_PROOF_KEYS_UNAVAILABLE",
+          "INSTALLATION_BOUND_ELSEWHERE"
+        ]
+      },
+      "InstallationRefusal": {
+        "description": "Every refusal of a proof or a binding.",
+        "type": "object",
+        "allOf": [{ "$ref": "#/components/schemas/Error" }],
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": { "$ref": "#/components/schemas/InstallationRefusalCode" }
+            }
+          }
+        }
+      },
+      "BindingHolder": {
+        "description": "The binding of this owner that the platform holds when the request arrives.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "tenant_id", "proof_kind", "status", "changed_at"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/InstallationId" },
+          "tenant_id": { "$ref": "#/components/schemas/ResourceId" },
+          "proof_kind": { "$ref": "#/components/schemas/ProofKind" },
+          "status": { "$ref": "#/components/schemas/InstallationStatus" },
+          "changed_at": {
+            "description": "proven_at for an active binding, ended_at for one that ended.",
+            "$ref": "#/components/schemas/Timestamp"
+          }
+        }
+      },
+      "BindingCase": {
+        "description": "A test vector, never a wire shape: what one PUT /installations/{installation_id} sees once its proof has decoded, and what it must answer. It assumes a proof whose signature verifies. An implementation runs these files.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tenant_id",
+          "installation_id",
+          "at",
+          "keys_available",
+          "claims",
+          "holder",
+          "refusal",
+          "effect"
+        ],
+        "properties": {
+          "tenant_id": { "$ref": "#/components/schemas/ResourceId" },
+          "installation_id": { "$ref": "#/components/schemas/InstallationId" },
+          "at": { "$ref": "#/components/schemas/Timestamp" },
+          "keys_available": { "type": "boolean" },
+          "claims": {
+            "oneOf": [
+              { "$ref": "#/components/schemas/GitHubCiClaims" },
+              { "$ref": "#/components/schemas/GitLabCiClaims" },
+              { "$ref": "#/components/schemas/AttestationClaims" }
+            ]
+          },
+          "holder": {
+            "oneOf": [{ "$ref": "#/components/schemas/BindingHolder" }, { "type": "null" }]
+          },
+          "refusal": {
+            "oneOf": [
+              { "$ref": "#/components/schemas/InstallationRefusalCode" },
+              { "type": "null" }
+            ]
+          },
+          "effect": { "enum": ["bound", "renewed", "unchanged", "displaced", null] }
         }
       }
     }

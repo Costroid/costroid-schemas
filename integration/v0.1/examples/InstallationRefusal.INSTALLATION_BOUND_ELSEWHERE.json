@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INSTALLATION_BOUND_ELSEWHERE",
+    "message": "Another tenant holds this owner under a rule this proof does not beat."
+  }
+}

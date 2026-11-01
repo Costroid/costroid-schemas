@@ -1,0 +1,23 @@
+{
+  "tenant_id": "org_01JEXAMPLE0001",
+  "installation_id": "github-owner:7204411",
+  "at": "2026-10-01T08:08:01Z",
+  "keys_available": true,
+  "claims": {
+    "iss": "https://token.actions.githubusercontent.com",
+    "aud": "https://app.costroid.com/tenants/org_01JEXAMPLE0001",
+    "iat": 1790841720,
+    "exp": 1790842020,
+    "jti": "example-3f0a9b1c",
+    "sub": "repo:example/widgets:ref:refs/heads/main",
+    "repository": "example/widgets",
+    "repository_id": "903114",
+    "repository_owner": "example",
+    "repository_owner_id": "7204411",
+    "ref": "refs/heads/main",
+    "event_name": "schedule"
+  },
+  "holder": null,
+  "refusal": "INSTALLATION_PROOF_EXPIRED",
+  "effect": null
+}

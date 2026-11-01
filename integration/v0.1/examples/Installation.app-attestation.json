@@ -1,0 +1,10 @@
+{
+  "id": "github:58120394",
+  "tenant_id": "org_01JEXAMPLE0001",
+  "owner_id": "7204411",
+  "status": "active",
+  "proof_kind": "app_attestation",
+  "bound_at": "2026-10-01T08:02:11Z",
+  "proven_at": "2026-10-01T08:02:00Z",
+  "ended_at": null
+}

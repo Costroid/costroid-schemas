@@ -8,6 +8,10 @@ import Ajv2020 from 'ajv/dist/2020.js'
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const VERSION_DIRECTORY = /^v\d+\.\d+$/
 const SCHEMA_BASE = 'https://raw.githubusercontent.com/Costroid/costroid-schemas/main/'
+const PROOF_AUDIENCE_BASE = 'https://app.costroid.com/tenants/'
+const PROOF_WINDOW_SECONDS = 600
+const CLOCK_SKEW_SECONDS = 60
+const CI_PROOF_CURRENT_SECONDS = 7 * 24 * 60 * 60
 
 const failures = []
 const report = (path, problem) => {
@@ -141,6 +145,66 @@ function focusRowProblems(row, requestIds) {
   return problems
 }
 
+const unixSeconds = (timestamp) => Date.parse(timestamp) / 1000
+
+function provenSubject(claims) {
+  if (claims.repository_owner_id !== undefined)
+    return { id: `github-owner:${claims.repository_owner_id}`, kind: 'ci_oidc' }
+  if (claims.namespace_id !== undefined)
+    return { id: `gitlab-namespace:${claims.namespace_id}`, kind: 'ci_oidc' }
+  return { id: claims.sub, kind: 'app_attestation' }
+}
+
+function proofRefusal(binding, subject) {
+  const { claims } = binding
+  const now = unixSeconds(binding.at)
+  const lastValid = Math.min(claims.exp, claims.iat + PROOF_WINDOW_SECONDS)
+  if (!binding.keys_available) return 'INSTALLATION_PROOF_KEYS_UNAVAILABLE'
+  if (claims.aud !== PROOF_AUDIENCE_BASE + binding.tenant_id)
+    return 'INSTALLATION_PROOF_AUDIENCE_MISMATCH'
+  if (now > lastValid + CLOCK_SKEW_SECONDS || claims.iat > now + CLOCK_SKEW_SECONDS)
+    return 'INSTALLATION_PROOF_EXPIRED'
+  if (subject.id !== binding.installation_id) return 'INSTALLATION_PROOF_SUBJECT_MISMATCH'
+  return null
+}
+
+function holderYields(holder, subject, now) {
+  if (subject.kind === 'app_attestation')
+    return holder.proof_kind === 'ci_oidc' || holder.id !== subject.id
+  return (
+    holder.proof_kind === 'ci_oidc' &&
+    now - unixSeconds(holder.changed_at) > CI_PROOF_CURRENT_SECONDS
+  )
+}
+
+function bindingAnswer(binding) {
+  const { claims, holder, tenant_id: tenant } = binding
+  const subject = provenSubject(claims)
+  const refusal = proofRefusal(binding, subject)
+  const heldHere = holder?.status === 'active' && holder.tenant_id === tenant
+  if (heldHere && holder.id === binding.installation_id) {
+    const newer = refusal === null && claims.iat > unixSeconds(holder.changed_at)
+    return { refusal: null, effect: newer ? 'renewed' : 'unchanged' }
+  }
+  if (refusal !== null) return { refusal, effect: null }
+  if (holder === null || heldHere) return { refusal: null, effect: 'bound' }
+  if (claims.iat <= unixSeconds(holder.changed_at))
+    return { refusal: 'INSTALLATION_PROOF_EXPIRED', effect: null }
+  if (holder.status !== 'active') return { refusal: null, effect: 'bound' }
+  return holderYields(holder, subject, unixSeconds(binding.at))
+    ? { refusal: null, effect: 'displaced' }
+    : { refusal: 'INSTALLATION_BOUND_ELSEWHERE', effect: null }
+}
+
+function bindingCaseProblems(binding) {
+  const answer = bindingAnswer(binding)
+  if (answer.refusal !== binding.refusal || answer.effect !== binding.effect)
+    throw new Error(
+      `the rules answer ${answer.refusal ?? answer.effect}, the example states ${binding.refusal ?? binding.effect}`,
+    )
+  return answer.refusal === null ? [] : [answer.refusal]
+}
+
 const describeErrors = (errors) =>
   errors
     .slice(0, 3)
@@ -155,6 +219,8 @@ function problemsWith(validate, path, contract, requestIds) {
       problems.push(
         ...focusRowProblems(instance, requestIds).map((problem) => `item ${index + 1}: ${problem}`),
       )
+    else if (basename(path).startsWith('BindingCase.'))
+      problems.push(...bindingCaseProblems(instance).map((code) => `item ${index + 1}: ${code}`))
   }
   return problems
 }
@@ -191,6 +257,7 @@ function checkOpenApi(path, document) {
     if (typeof node !== 'object' || node === null) return
     for (const [key, value] of Object.entries(node)) {
       if (key === '$ref' && typeof value === 'string') checkReference(path, document, value)
+      else if (key === 'externalValue') checkExternalValue(path, value)
       else walk(value)
     }
   }
@@ -212,6 +279,22 @@ function checkReference(path, document, reference) {
     if (target === undefined) report(path, `${reference} resolves to nothing`)
   } else if (!existsSync(resolve(dirname(path), reference)))
     report(path, `${reference} names no file`)
+}
+
+function checkExternalValue(path, value) {
+  if (!existsSync(resolve(dirname(path), value))) report(path, `${value} names no file`)
+}
+
+function checkRefusalCoverage(directory, document) {
+  const codes = document.components.schemas.InstallationRefusalCode?.enum ?? []
+  const contractText = JSON.stringify(document.paths)
+  const rejected = readdirSync(join(directory, 'examples', 'rejected'))
+  for (const code of codes) {
+    const example = join('examples', `InstallationRefusal.${code}.json`)
+    if (!contractText.includes(example)) report(directory, `${code} has no example in openapi.json`)
+    if (!rejected.some((name) => name.split('.')[1] === code))
+      report(directory, `${code} has no negative example`)
+  }
 }
 
 const directories = versionDirectories()
@@ -254,6 +337,7 @@ function checkContract(directory) {
       if (validate === undefined) throw new Error(`no component schema named ${component}`)
       return validate
     })
+    checkRefusalCoverage(directory, document)
   } else {
     const id = schemaFiles.get(directory)
     if (id === undefined) throw new Error('no schema')
