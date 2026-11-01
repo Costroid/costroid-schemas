@@ -1,0 +1,8 @@
+{
+  "costroid/cost_source": "otlp",
+  "costroid/cost_basis": "measured",
+  "costroid/attribution_grade": "unattributed",
+  "costroid/enforcement_grade": "none",
+  "costroid/run_identity": "unverified",
+  "costroid/branch": "main"
+}
