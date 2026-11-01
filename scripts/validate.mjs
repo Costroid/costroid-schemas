@@ -221,7 +221,7 @@ for (const directory of directories) {
   }
 }
 
-for (const directory of directories) {
+function checkContract(directory) {
   const openApiPath = join(directory, 'openapi.json')
   if (existsSync(openApiPath)) {
     const document = readJson(openApiPath)
@@ -239,12 +239,18 @@ for (const directory of directories) {
     })
   } else {
     const id = schemaFiles.get(directory)
-    if (id === undefined) report(directory, 'no schema')
-    else {
-      const validate = ajv.getSchema(id)
-      pass(join(directory, basename(id)), 'schema compiled')
-      checkExamples(directory, () => validate)
-    }
+    if (id === undefined) throw new Error('no schema')
+    const validate = ajv.getSchema(id)
+    pass(join(directory, basename(id)), 'schema compiled')
+    checkExamples(directory, () => validate)
+  }
+}
+
+for (const directory of directories) {
+  try {
+    checkContract(directory)
+  } catch (error) {
+    report(directory, error.message)
   }
 }
 
