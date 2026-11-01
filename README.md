@@ -5,7 +5,8 @@ Open, versioned contracts for [Costroid](https://github.com/Costroid/costroid), 
 | Contract                                         | What it fixes                                                                       |
 | ------------------------------------------------ | ----------------------------------------------------------------------------------- |
 | [`tags/v0.1`](tags/v0.1/README.md)               | The tags that join a FOCUS row to a pull request, and the mapping to OpenTelemetry. |
-| [`focus-row/v0.1`](focus-row/v0.1/README.md)     | One row per model request per token class, in FOCUS 1.4.                            |
+| [`focus-row/v0.2`](focus-row/v0.2/README.md)     | One row per model request per token class, in FOCUS 1.4.                            |
+| [`focus-row/v0.1`](focus-row/v0.1/README.md)     | The same row, before region and service tier columns.                               |
 | [`integration/v0.1`](integration/v0.1/README.md) | Tenant identity, installation proof, tokens, exports and quotas, in OpenAPI 3.1.    |
 
 ## Why it exists
