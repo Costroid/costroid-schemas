@@ -4,8 +4,8 @@ Open, versioned contracts for Costroid and Costroid Platform. This repository is
 
 ## Layout
 
-- `tags/v0.1/`: the per-PR tag convention.
-- `focus-row/v0.1/`, `focus-row/v0.2/`: one Costroid FOCUS row.
+- `tags/v0.1/`, `tags/v0.2/`: the per-PR tag convention.
+- `focus-row/v0.1/`, `focus-row/v0.2/`, `focus-row/v0.3/`: one Costroid FOCUS row.
 - `integration/v0.1/`: the OpenAPI contract between the two products.
 - `scripts/validate.mjs`: checks every example against its schema.
 
