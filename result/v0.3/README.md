@@ -30,7 +30,7 @@ The report creates the check run, then writes the check run's id into the check 
 
 When `state` is not `reported`, `figures` is empty, `rows` is `0` and `reason` is one of `no_rows_file`, `empty_rows_file`, `rows_path_not_a_file`, `rows_file_unread` or `invalid_row`. `reason_line` names the line of an `invalid_row`.
 
-`run_reason` says why the run wrote no rows, when the run stated why: `no_usage` when the agent ended and reported no usage, `concurrent_run` when another run held the agent's state directory and this run never started its agent. It appears only when `state` is not `reported`.
+`run_reason` says why the run wrote no rows, when the run stated why: `no_usage` when the agent ended and reported no usage, `concurrent_run` when another run held the agent's state directory and this run never started its agent. It appears only when `state` is not `reported`. `costroid run` writes its object beside the rows file it wrote, and the report reads `run_reason` from that object. A report from an older release ignores a `run_reason` it does not know.
 
 ## The policy
 
