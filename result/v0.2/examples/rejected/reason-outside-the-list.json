@@ -1,0 +1,32 @@
+{
+  "schema": "costroid.result/0.2",
+  "conclusion": null,
+  "state": "no_rows",
+  "reason": "agent_crashed",
+  "head_sha": "",
+  "amounts": "shown",
+  "rows": 0,
+  "run_identity": "unverified",
+  "figures": [],
+  "figures_omitted": 0,
+  "budget": {
+    "currency": "USD",
+    "amount": "5",
+    "enforcement_grade": null,
+    "cost": null,
+    "cost_basis": null,
+    "remainder": null,
+    "overshoot": null,
+    "overshoot_tokens": null
+  },
+  "data": {
+    "agents": [],
+    "models": [],
+    "models_omitted": 0,
+    "catalog_versions": [],
+    "fallback_models": [],
+    "fallback_models_omitted": 0,
+    "fallback_price_ids": [],
+    "fallback_price_ids_omitted": 0
+  }
+}
