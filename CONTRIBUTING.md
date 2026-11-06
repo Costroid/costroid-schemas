@@ -21,3 +21,12 @@ CI rejects a pull request with an unsigned commit. Contributions are licensed un
 5. Open a pull request with three sections: changed, deliberately unchanged, verified.
 
 Commit messages use the imperative mood and say what changed and why.
+
+## Rules
+
+- A published version directory is never edited. A change is a new directory.
+- Every schema has examples. `examples/` must pass and `examples/rejected/` must fail.
+- Amounts are decimal strings, at most 12 fractional digits, never JSON numbers.
+- An external fact carries its source URL and retrieval date.
+- Example names and figures are synthetic. Say so.
+- No platform code enters this repository. The contract is the only dependency between the products.
