@@ -34,7 +34,7 @@ No file means no run has started an agent in this job. A file that reads `runnin
 
 `remainder` is the cap minus the spend in USD, and `overshoot` the spend minus the cap; one of them is `0`. A run with no spend in USD has spent `0`. Both are null when the spend is not known, and when the spend in USD holds two entries, because no one figure then compares with the cap. The cap is not the policy's budget.
 
-`enforcement_grade` is the grade the run started at, or the one the agent's reader stated when the agent ended. The result object states the grade the run earned once its rows are checked, and the two can differ.
+`enforcement_grade` is the grade the run started at while the agent works, then the one the agent's reader stated when the agent ended. The run's last write states the grade the run earned once its rows were checked, which its result object states too. A gateway whose store failed, or a run past its overshoot bound, reads `none` there.
 
 ## What it never holds
 
