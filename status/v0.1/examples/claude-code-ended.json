@@ -1,0 +1,23 @@
+{
+  "schema": "costroid.status/0.1",
+  "state": "ended",
+  "agent": "claude-code",
+  "updates": "agent_end",
+  "started_at": "2026-11-01T11:15:12Z",
+  "updated_at": "2026-11-01T11:15:19.12Z",
+  "spend": [
+    {
+      "currency": "USD",
+      "cost_basis": "list_equivalent",
+      "list_cost": "0.001619725"
+    }
+  ],
+  "requests": 4,
+  "cap": {
+    "currency": "USD",
+    "amount": "5",
+    "remainder": "4.998380275",
+    "overshoot": "0"
+  },
+  "enforcement_grade": "agent-flag"
+}
