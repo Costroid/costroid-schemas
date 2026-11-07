@@ -1,0 +1,29 @@
+{
+  "schema": "costroid.result/0.5",
+  "conclusion": "neutral",
+  "state": "no_rows",
+  "reason": "agent_skipped",
+  "agent_error": null,
+  "agent_skipped": null,
+  "head_sha": "",
+  "ci_run": {
+    "id": 19203384756,
+    "attempt": 1
+  },
+  "amounts": "shown",
+  "rows": 0,
+  "run_identity": "unverified",
+  "figures": [],
+  "figures_omitted": 0,
+  "cap": null,
+  "data": {
+    "agents": [],
+    "models": [],
+    "models_omitted": 0,
+    "catalog_versions": [],
+    "fallback_models": [],
+    "fallback_models_omitted": 0,
+    "fallback_price_ids": [],
+    "fallback_price_ids_omitted": 0
+  }
+}
