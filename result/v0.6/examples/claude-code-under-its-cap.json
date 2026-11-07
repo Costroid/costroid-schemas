@@ -1,0 +1,76 @@
+{
+  "schema": "costroid.result/0.6",
+  "check_run_id": 16873409921,
+  "conclusion": "neutral",
+  "state": "reported",
+  "agent_error": null,
+  "agent_skipped": null,
+  "head_sha": "9f2c6e1ab47d03f58c1e7726d0b4a93e5f618c2d",
+  "ci_run": null,
+  "rows_sha256": "ffbdfb76589dfdfd44187050fde97f7a44684d0cb9bb588394dc005ff65bc8f4",
+  "rows_file_sha256": "74a8dbed24e7286ecc81ca4095a40a499f2ba2cfcde88e9a47522b2123888036",
+  "amounts": "shown",
+  "rows": 19,
+  "run_identity": "unverified",
+  "figures": [
+    {
+      "currency": "USD",
+      "list_cost": "0.001619725",
+      "cost_basis": "list_equivalent",
+      "attribution_grade": "unattributed",
+      "enforcement_grade": "agent-flag",
+      "rows": 19,
+      "fallback_rows": 0,
+      "tokens": {
+        "cache_read": "15605",
+        "cache_write_1h": "4450",
+        "cache_write_5m": "3495",
+        "cached_input_reported": "15605",
+        "input_uncached": "8",
+        "output": "272",
+        "reasoning_output": "121"
+      }
+    }
+  ],
+  "figures_omitted": 0,
+  "cap": {
+    "currency": "USD",
+    "amount": "5",
+    "enforcement_grade": "agent-flag",
+    "cost": "0.001619725",
+    "cost_basis": "list_equivalent",
+    "remainder": "4.998380275",
+    "overshoot": "0",
+    "overshoot_tokens": "0"
+  },
+  "data": {
+    "agents": [
+      "claude-code"
+    ],
+    "models": [
+      "claude-haiku-5-5"
+    ],
+    "models_omitted": 0,
+    "catalog_versions": [
+      "0.1.0"
+    ],
+    "fallback_models": [],
+    "fallback_models_omitted": 0,
+    "fallback_price_ids": [],
+    "fallback_price_ids_omitted": 0
+  },
+  "lifetime": {
+    "figures": [
+      {
+        "currency": "USD",
+        "cost_basis": "list_equivalent",
+        "list_cost": "0.001619725",
+        "reports": 1,
+        "may_repeat": false
+      }
+    ],
+    "figures_omitted": 0,
+    "capped": false,
+    "unread": 0
+  }
+}

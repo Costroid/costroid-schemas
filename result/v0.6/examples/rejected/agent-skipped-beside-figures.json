@@ -1,0 +1,50 @@
+{
+  "schema": "costroid.result/0.6",
+  "conclusion": "neutral",
+  "state": "reported",
+  "agent_error": null,
+  "agent_skipped": true,
+  "head_sha": "",
+  "ci_run": {
+    "id": 19203384756,
+    "attempt": 1
+  },
+  "rows_sha256": null,
+  "rows_file_sha256": null,
+  "amounts": "shown",
+  "rows": 19,
+  "run_identity": "unverified",
+  "figures": [
+    {
+      "currency": "USD",
+      "list_cost": "0.001619725",
+      "cost_basis": "list_equivalent",
+      "attribution_grade": "unattributed",
+      "enforcement_grade": "agent-flag",
+      "rows": 19,
+      "fallback_rows": 0,
+      "tokens": {
+        "cache_read": "15605",
+        "cache_write_1h": "4450",
+        "cache_write_5m": "3495",
+        "cached_input_reported": "15605",
+        "input_uncached": "8",
+        "output": "272",
+        "reasoning_output": "121"
+      }
+    }
+  ],
+  "figures_omitted": 0,
+  "cap": null,
+  "data": {
+    "agents": [],
+    "models": [],
+    "models_omitted": 0,
+    "catalog_versions": [],
+    "fallback_models": [],
+    "fallback_models_omitted": 0,
+    "fallback_price_ids": [],
+    "fallback_price_ids_omitted": 0
+  },
+  "lifetime": null
+}
