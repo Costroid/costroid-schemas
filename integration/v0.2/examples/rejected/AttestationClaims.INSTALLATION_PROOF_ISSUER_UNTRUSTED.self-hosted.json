@@ -1,0 +1,9 @@
+{
+  "iss": "https://costroid.example",
+  "aud": "https://app.costroid.com/tenants/org_01JEXAMPLE0001",
+  "sub": "github:58120394",
+  "owner_id": "7204411",
+  "delivery": "72d3162e-cc78-11e3-81ab-4c9367dc0958",
+  "iat": 1790841720,
+  "exp": 1790842320
+}

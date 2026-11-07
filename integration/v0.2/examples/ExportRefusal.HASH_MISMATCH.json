@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "HASH_MISMATCH",
+    "message": "The body does not hash to Costroid-Content-SHA256."
+  }
+}

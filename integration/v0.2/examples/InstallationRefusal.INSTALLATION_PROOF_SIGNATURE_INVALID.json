@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INSTALLATION_PROOF_SIGNATURE_INVALID",
+    "message": "The proof does not verify under the issuer's published keys."
+  }
+}

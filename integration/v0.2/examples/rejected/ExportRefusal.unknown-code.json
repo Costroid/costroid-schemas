@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "QUOTA_EXPORTS_PER_DAY",
+    "message": "A quota answers 429 with its own code, never as an export refusal."
+  }
+}
