@@ -1,0 +1,17 @@
+{
+  "schema": "costroid.status/0.1",
+  "state": "ended",
+  "agent": "codex",
+  "updates": "each_request",
+  "started_at": "2026-11-01T12:00:00Z",
+  "updated_at": "2026-11-01T12:00:01.5Z",
+  "spend": [],
+  "requests": 0,
+  "cap": {
+    "currency": "USD",
+    "amount": "5",
+    "remainder": "5",
+    "overshoot": "0"
+  },
+  "enforcement_grade": "none"
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "costroid.status/0.1",
+  "state": "running",
+  "agent": "codex",
+  "updates": "each_request",
+  "started_at": "2026-11-01T11:17:09Z",
+  "updated_at": "2026-11-01T11:17:10.25Z",
+  "spend": [
+    {
+      "currency": "usd",
+      "cost_basis": null,
+      "list_cost": "0.0291216"
+    }
+  ],
+  "requests": 1,
+  "cap": {
+    "currency": "USD",
+    "amount": "5",
+    "remainder": "4.9708784",
+    "overshoot": "0"
+  },
+  "enforcement_grade": "wrapper-watchdog"
+}
