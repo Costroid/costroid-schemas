@@ -1,0 +1,46 @@
+{
+  "schema": "costroid.result/0.8",
+  "conclusion": null,
+  "state": "reported",
+  "agent_error": null,
+  "agent_skipped": null,
+  "head_sha": "",
+  "ci_run": null,
+  "rows_sha256": "4f17eb3bb05a8f19c699806e6fc45ca3a6820bbc4d9b5b488cd7ad44f38f75f3",
+  "rows_file_sha256": "f211d2e65aedcb30d2767d43a7a86170a52a00250487453dc3070bf80a113c3b",
+  "amounts": "withheld",
+  "rows": 15,
+  "run_identity": "unverified",
+  "figures": [
+    {
+      "currency": "USD",
+      "cost_basis": "measured",
+      "attribution_grade": "unattributed",
+      "enforcement_grade": "none",
+      "rows": 15,
+      "fallback_rows": 0
+    }
+  ],
+  "figures_omitted": 0,
+  "cap": null,
+  "data": {
+    "agents": [
+      "gh-aw"
+    ],
+    "models": [
+      "claude-haiku-5-5",
+      "claude-sonnet-5"
+    ],
+    "models_omitted": 0,
+    "catalog_versions": [
+      "0.1.0"
+    ],
+    "fallback_models": [],
+    "fallback_models_omitted": 0,
+    "fallback_price_ids": [],
+    "fallback_price_ids_omitted": 0
+  },
+  "lifetime": null,
+  "agent_stated": null,
+  "recorded": null
+}
