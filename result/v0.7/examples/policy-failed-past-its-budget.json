@@ -1,0 +1,100 @@
+{
+  "schema": "costroid.result/0.7",
+  "check_run_id": 16873409922,
+  "conclusion": "failure",
+  "state": "reported",
+  "agent_error": null,
+  "agent_skipped": null,
+  "head_sha": "9f2c6e1ab47d03f58c1e7726d0b4a93e5f618c2d",
+  "ci_run": null,
+  "rows_sha256": "a23792b26f23e618109e292ee938ca2542a2f3d3229afd6965cfa6c8e11ffb09",
+  "rows_file_sha256": "d60426c3af9ba3cc08f526b58432aa644b8d1d73393ade62b9c7f544f9f7ffdf",
+  "amounts": "shown",
+  "rows": 4,
+  "run_identity": "unverified",
+  "figures": [
+    {
+      "currency": "USD",
+      "list_cost": "0.0283136",
+      "cost_basis": "measured",
+      "attribution_grade": "unattributed",
+      "enforcement_grade": "wrapper-watchdog",
+      "rows": 4,
+      "fallback_rows": 0,
+      "tokens": {
+        "cache_read": "11264",
+        "cached_input_reported": "11264",
+        "input_uncached": "5632",
+        "output": "64"
+      }
+    }
+  ],
+  "figures_omitted": 0,
+  "cap": {
+    "currency": "USD",
+    "amount": "0.001",
+    "enforcement_grade": "wrapper-watchdog",
+    "cost": "0.0283136",
+    "cost_basis": "measured",
+    "remainder": "0",
+    "overshoot": "0.0273136",
+    "overshoot_tokens": "16960"
+  },
+  "data": {
+    "agents": [
+      "codex"
+    ],
+    "models": [
+      "gpt-5.6-sol"
+    ],
+    "models_omitted": 0,
+    "catalog_versions": [
+      "0.1.0"
+    ],
+    "fallback_models": [],
+    "fallback_models_omitted": 0,
+    "fallback_price_ids": [],
+    "fallback_price_ids_omitted": 0
+  },
+  "lifetime": {
+    "figures": [
+      {
+        "currency": "USD",
+        "cost_basis": "measured",
+        "list_cost": "0.0283136",
+        "reports": 1,
+        "may_repeat": false
+      }
+    ],
+    "figures_omitted": 0,
+    "capped": false,
+    "unread": 0
+  },
+  "agent_stated": null,
+  "policy": {
+    "conclusion": "failure",
+    "trust": "unverified",
+    "pack_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "config_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+    "config_ref": "3333333333333333333333333333333333333333",
+    "config": "found",
+    "config_from_base": true,
+    "evaluated_at": "2026-11-06T18:00:00Z",
+    "warn_only": {
+      "active": false,
+      "reason": "ended",
+      "started": "2026-10-20T09:00:00Z",
+      "ends": "2026-10-27T09:00:00Z"
+    },
+    "results": [
+      {
+        "rule": "run_budget",
+        "outcome": "fail",
+        "reason": "over_limit",
+        "limit_usd": "0.001",
+        "cost_usd": "0.0283136"
+      }
+    ],
+    "joinable_rows": 0
+  }
+}
