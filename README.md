@@ -4,9 +4,11 @@ Open, versioned contracts for [Costroid](https://github.com/Costroid/costroid), 
 
 | Contract                                         | What it fixes                                                                                                                |
 | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| [`tags/v0.3`](tags/v0.3/README.md)               | The same tags, plus a work item, an experiment's arm and a team that a caller names.                                         |
 | [`tags/v0.2`](tags/v0.2/README.md)               | The tags that join a FOCUS row to a pull request, and the mapping to OpenTelemetry.                                          |
 | [`tags/v0.1`](tags/v0.1/README.md)               | The same tags, before the assumed cache lifetime.                                                                            |
-| [`focus-row/v0.3`](focus-row/v0.3/README.md)     | One row per model request per token class, in FOCUS 1.4.                                                                     |
+| [`focus-row/v0.4`](focus-row/v0.4/README.md)     | One row per model request per token class, in FOCUS 1.4, with a strict profile for readers that merge it with provider data. |
+| [`focus-row/v0.3`](focus-row/v0.3/README.md)     | The same row, before the strict profile and the tags a caller names.                                                         |
 | [`focus-row/v0.2`](focus-row/v0.2/README.md)     | The same row, before the 30-minute and 12-hour cache write classes.                                                          |
 | [`focus-row/v0.1`](focus-row/v0.1/README.md)     | The same row, before region and service tier columns.                                                                        |
 | [`status/v0.1`](status/v0.1/README.md)           | What a run has spent while its agent works: spend per basis, cap, grade and counts.                                          |
