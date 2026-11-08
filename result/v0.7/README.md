@@ -80,3 +80,4 @@ gh-aw states its AI credits. The quantity is the last `ai_credits_total` of the 
 ## Changes from 0.6
 
 - `agent_stated` is new. It is present in every object, and null when the agent stated nothing and in every copy that withholds amounts.
+- `policy.results` adds the reasons `unmeasured_spend` and `no_run_rows`. `unmeasured_spend` is a budget, increase or model rule on `token_verified` rows whose spend only the agent's own token counts stand behind, which concludes `unproven` instead of passing. `no_run_rows` is a rule that reads one run's rows, asked of a ledger whose answer covers the whole pull request, which concludes `unproven`.
