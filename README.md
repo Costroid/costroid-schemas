@@ -2,14 +2,18 @@
 
 Open, versioned contracts for [Costroid](https://github.com/Costroid/costroid), the cost check for pull requests, and Costroid Platform.
 
-| Contract                                         | What it fixes                                                                       |
-| ------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| [`tags/v0.2`](tags/v0.2/README.md)               | The tags that join a FOCUS row to a pull request, and the mapping to OpenTelemetry. |
-| [`tags/v0.1`](tags/v0.1/README.md)               | The same tags, before the assumed cache lifetime.                                   |
-| [`focus-row/v0.3`](focus-row/v0.3/README.md)     | One row per model request per token class, in FOCUS 1.4.                            |
-| [`focus-row/v0.2`](focus-row/v0.2/README.md)     | The same row, before the 30-minute and 12-hour cache write classes.                 |
-| [`focus-row/v0.1`](focus-row/v0.1/README.md)     | The same row, before region and service tier columns.                               |
-| [`integration/v0.1`](integration/v0.1/README.md) | Tenant identity, installation proof, tokens, exports and quotas, in OpenAPI 3.1.    |
+| Contract                                         | What it fixes                                                                                 |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| [`tags/v0.2`](tags/v0.2/README.md)               | The tags that join a FOCUS row to a pull request, and the mapping to OpenTelemetry.           |
+| [`tags/v0.1`](tags/v0.1/README.md)               | The same tags, before the assumed cache lifetime.                                             |
+| [`focus-row/v0.3`](focus-row/v0.3/README.md)     | One row per model request per token class, in FOCUS 1.4.                                      |
+| [`focus-row/v0.2`](focus-row/v0.2/README.md)     | The same row, before the 30-minute and 12-hour cache write classes.                           |
+| [`focus-row/v0.1`](focus-row/v0.1/README.md)     | The same row, before region and service tier columns.                                         |
+| [`status/v0.1`](status/v0.1/README.md)           | What a run has spent while its agent works: spend per basis, cap, grade and counts.           |
+| [`result/v0.6`](result/v0.6/README.md)           | One object per Costroid report, with the rows it was built from and the pull request's total. |
+| [`result/v0.5`](result/v0.5/README.md)           | The same object, before the rows' digests and the lifetime total.                             |
+| [`integration/v0.2`](integration/v0.2/README.md) | The run token, row identity, cost refusals and month-wide restatement.                        |
+| [`integration/v0.1`](integration/v0.1/README.md) | Tenant identity, installation proof, tokens, exports and quotas, in OpenAPI 3.1.              |
 
 ## Why it exists
 
