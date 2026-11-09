@@ -1,0 +1,46 @@
+{
+  "schema": "costroid.result/0.9",
+  "check_run_id": 16873409921,
+  "conclusion": "neutral",
+  "state": "reported",
+  "agent_error": null,
+  "agent_skipped": null,
+  "head_sha": "9f2c6e1ab47d03f58c1e7726d0b4a93e5f618c2d",
+  "ci_run": null,
+  "rows_sha256": null,
+  "rows_file_sha256": null,
+  "amounts": "withheld",
+  "rows": 19,
+  "run_identity": "unverified",
+  "figures": [
+    {
+      "currency": "USD",
+      "cost_basis": "list_equivalent",
+      "attribution_grade": "unattributed",
+      "enforcement_grade": "agent-flag",
+      "rows": 19,
+      "fallback_rows": 0
+    }
+  ],
+  "figures_omitted": 0,
+  "cap": null,
+  "data": {
+    "agents": [
+      "claude-code"
+    ],
+    "models": [
+      "claude-haiku-5-5"
+    ],
+    "models_omitted": 0,
+    "catalog_versions": [
+      "0.1.0"
+    ],
+    "fallback_models": [],
+    "fallback_models_omitted": 0,
+    "fallback_price_ids": [],
+    "fallback_price_ids_omitted": 0
+  },
+  "lifetime": null,
+  "agent_stated": null,
+  "recorded": null
+}

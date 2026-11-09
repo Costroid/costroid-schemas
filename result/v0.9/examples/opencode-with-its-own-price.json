@@ -1,0 +1,65 @@
+{
+  "schema": "costroid.result/0.9",
+  "conclusion": null,
+  "state": "reported",
+  "agent_error": null,
+  "agent_skipped": null,
+  "head_sha": "",
+  "ci_run": null,
+  "rows_sha256": "faa1478469762562fd55feed91dabf50cc1bdf2979ae47aaef902c31c3489749",
+  "rows_file_sha256": "81f19ac237743bc32870c11d83036098836370e11e9a88a9fc8bc4b6ebea0a35",
+  "amounts": "shown",
+  "rows": 7,
+  "run_identity": "unverified",
+  "figures": [
+    {
+      "currency": "USD",
+      "list_cost": "0.00153317",
+      "cost_basis": "measured",
+      "attribution_grade": "unattributed",
+      "enforcement_grade": "wrapper-watchdog",
+      "rows": 7,
+      "fallback_rows": 0,
+      "tokens": {
+        "cache_read": "10532",
+        "cache_write_5m": "10806",
+        "input_uncached": "6",
+        "output": "153"
+      }
+    }
+  ],
+  "figures_omitted": 0,
+  "cap": {
+    "currency": "USD",
+    "amount": "1",
+    "enforcement_grade": "wrapper-watchdog",
+    "cost": "0.00153317",
+    "cost_basis": "measured",
+    "remainder": "0.99846683",
+    "overshoot": "0",
+    "overshoot_tokens": "0"
+  },
+  "data": {
+    "agents": [
+      "opencode"
+    ],
+    "models": [
+      "claude-haiku-5-5"
+    ],
+    "models_omitted": 0,
+    "catalog_versions": [
+      "0.3.0"
+    ],
+    "fallback_models": [],
+    "fallback_models_omitted": 0,
+    "fallback_price_ids": [],
+    "fallback_price_ids_omitted": 0
+  },
+  "lifetime": null,
+  "agent_stated": {
+    "unit": "USD",
+    "quantity": "0.00153317",
+    "source": "opencode"
+  },
+  "recorded": null
+}

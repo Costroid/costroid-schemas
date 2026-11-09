@@ -1,0 +1,41 @@
+{
+  "schema": "costroid.result/0.9",
+  "conclusion": null,
+  "state": "no_rows",
+  "reason": "empty_rows_file",
+  "run_reason": "no_usage",
+  "agent_error": null,
+  "agent_skipped": null,
+  "head_sha": "",
+  "ci_run": null,
+  "rows_sha256": "ffbdfb76589dfdfd44187050fde97f7a44684d0cb9bb588394dc005ff65bc8f4",
+  "rows_file_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "amounts": "shown",
+  "rows": 0,
+  "run_identity": "unverified",
+  "figures": [],
+  "figures_omitted": 0,
+  "cap": {
+    "currency": "USD",
+    "amount": "5",
+    "enforcement_grade": null,
+    "cost": null,
+    "cost_basis": null,
+    "remainder": null,
+    "overshoot": null,
+    "overshoot_tokens": null
+  },
+  "data": {
+    "agents": [],
+    "models": [],
+    "models_omitted": 0,
+    "catalog_versions": [],
+    "fallback_models": [],
+    "fallback_models_omitted": 0,
+    "fallback_price_ids": [],
+    "fallback_price_ids_omitted": 0
+  },
+  "lifetime": null,
+  "agent_stated": null,
+  "recorded": null
+}
