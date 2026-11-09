@@ -14,6 +14,7 @@ Open, versioned contracts for [Costroid](https://github.com/Costroid/costroid), 
 | [`status/v0.1`](status/v0.1/README.md)           | What a run has spent while its agent works: spend per basis, cap, grade and counts.                                          |
 | [`result/v0.7`](result/v0.7/README.md)           | One object per Costroid report: its figures, the rows it was built from, the pull request's total and an agent's own figure. |
 | [`result/v0.8`](result/v0.8/README.md)           | One object per Costroid report: as v0.7, plus the recorded run a report shows in place of the pull request's own.            |
+| [`result/v0.9`](result/v0.9/README.md)           | One object per Costroid report: as v0.8, plus the figures OpenCode and Copilot CLI state, each in its own unit.              |
 | [`result/v0.6`](result/v0.6/README.md)           | The same object, before an agent's own figure and two run reasons.                                                           |
 | [`result/v0.5`](result/v0.5/README.md)           | The same object, before the rows' digests and the lifetime total.                                                            |
 | [`integration/v0.2`](integration/v0.2/README.md) | The run token, row identity, cost refusals and month-wide restatement.                                                       |
