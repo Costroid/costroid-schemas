@@ -1,0 +1,5 @@
+{
+  "agent_stream": "req_example_0001",
+  "provider_report": "req_example_0002",
+  "otlp": "req_example_0003"
+}
