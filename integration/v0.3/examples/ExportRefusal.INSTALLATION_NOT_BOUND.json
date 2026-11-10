@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INSTALLATION_NOT_BOUND",
+    "message": "This tenant holds no active binding of github-owner:7204411."
+  }
+}

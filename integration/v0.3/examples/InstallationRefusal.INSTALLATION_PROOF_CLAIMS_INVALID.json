@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INSTALLATION_PROOF_CLAIMS_INVALID",
+    "message": "The proof lacks a stable numeric id."
+  }
+}

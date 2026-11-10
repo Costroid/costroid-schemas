@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "RUN_TOKEN_MISSING",
+    "message": "A missing run token fails the batch on ingest, never the request."
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "EXPORT_BATCH_BUSY",
+    "message": "Other bytes of this batch are ingesting. Retry once they finish."
+  }
+}
