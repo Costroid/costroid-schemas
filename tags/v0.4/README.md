@@ -97,7 +97,7 @@ A cache write's source did not state its lifetime, and an adapter's rule assigne
 | `30m` | 30 minutes        | `cache_write_30m` |
 | `12h` | 12 hours          | `cache_write_12h` |
 
-This schema closes the values. [Row version 0.4](../../focus-row/v0.4/README.md#assumed-lifetimes) holds the value to the row's class and lists each source's rule.
+This schema closes the values. [Row version 0.5](../../focus-row/v0.5/README.md#assumed-lifetimes) holds the value to the row's class and lists each source's rule.
 
 ### `costroid/repo_visibility`
 
