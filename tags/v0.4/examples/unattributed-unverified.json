@@ -1,0 +1,9 @@
+{
+  "costroid/agent": "example-agent",
+  "costroid/model": "example-small-1",
+  "costroid/cost_source": "otlp",
+  "costroid/cost_basis": "measured",
+  "costroid/attribution_grade": "unattributed",
+  "costroid/enforcement_grade": "none",
+  "costroid/run_identity": "unverified"
+}

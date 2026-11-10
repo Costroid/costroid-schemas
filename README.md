@@ -4,6 +4,7 @@ Open, versioned contracts for [Costroid](https://github.com/Costroid/costroid), 
 
 | Contract                                         | What it fixes                                                                                                                |
 | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| [`tags/v0.4`](tags/v0.4/README.md)               | The same tags, plus the repository's visibility as the CI system states it.                                                  |
 | [`tags/v0.3`](tags/v0.3/README.md)               | The same tags, plus a work item, an experiment's arm and a team that a caller names.                                         |
 | [`tags/v0.2`](tags/v0.2/README.md)               | The tags that join a FOCUS row to a pull request, and the mapping to OpenTelemetry.                                          |
 | [`tags/v0.1`](tags/v0.1/README.md)               | The same tags, before the assumed cache lifetime.                                                                            |
