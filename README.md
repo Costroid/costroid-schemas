@@ -19,6 +19,7 @@ Open, versioned contracts for [Costroid](https://github.com/Costroid/costroid), 
 | [`result/v0.9`](result/v0.9/README.md)           | One object per Costroid report: as v0.8, plus the figures OpenCode and Copilot CLI state, each in its own unit.              |
 | [`result/v0.6`](result/v0.6/README.md)           | The same object, before an agent's own figure and two run reasons.                                                           |
 | [`result/v0.5`](result/v0.5/README.md)           | The same object, before the rows' digests and the lifetime total.                                                            |
+| [`integration/v0.3`](integration/v0.3/README.md) | Rows of focus-row/v0.5 and tags of tags/v0.4, and the refusal of a strict-profile row.                                       |
 | [`integration/v0.2`](integration/v0.2/README.md) | The run token, row identity, cost refusals and month-wide restatement.                                                       |
 | [`integration/v0.1`](integration/v0.1/README.md) | Tenant identity, installation proof, tokens, exports and quotas, in OpenAPI 3.1.                                             |
 
