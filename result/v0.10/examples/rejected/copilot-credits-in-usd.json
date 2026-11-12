@@ -1,0 +1,73 @@
+{
+  "schema": "costroid.result/0.10",
+  "conclusion": null,
+  "state": "reported",
+  "agent_error": null,
+  "agent_skipped": null,
+  "head_sha": "",
+  "ci_run": null,
+  "rows_sha256": "3a8d937bb388b88d6c6ff05f3ee13f39de69c8c5e8c9c2755e43a595353dbd53",
+  "rows_file_sha256": "967393c24cf4d0b730d80dabbd55a7ba3c04e3f0b44041c44e7292d2d49dac9f",
+  "amounts": "shown",
+  "rows": 13,
+  "run_identity": "unverified",
+  "figures": [
+    {
+      "currency": "USD",
+      "list_cost": "0.00329423",
+      "cost_basis": "measured",
+      "attribution_grade": "unattributed",
+      "enforcement_grade": "wrapper-watchdog",
+      "rows": 13,
+      "fallback_rows": 0,
+      "tokens": {
+        "cache_read": "43418",
+        "cache_write_5m": "21958",
+        "cached_input_reported": "43418",
+        "input_uncached": "8",
+        "output": "229"
+      }
+    }
+  ],
+  "figures_omitted": 0,
+  "cap": {
+    "currency": "USD",
+    "amount": "1",
+    "enforcement_grade": "wrapper-watchdog",
+    "cost": "0.00329423",
+    "cost_basis": "measured",
+    "remainder": "0.99670577",
+    "overshoot": "0",
+    "overshoot_tokens": "0"
+  },
+  "data": {
+    "agents": [
+      "copilot"
+    ],
+    "models": [
+      "claude-haiku-5-5"
+    ],
+    "models_omitted": 0,
+    "catalog_versions": [
+      "0.3.0"
+    ],
+    "fallback_models": [],
+    "fallback_models_omitted": 0,
+    "fallback_price_ids": [],
+    "fallback_price_ids_omitted": 0
+  },
+  "lifetime": null,
+  "agent_stated": {
+    "unit": "USD",
+    "quantity": "0",
+    "source": "copilot"
+  },
+  "recorded": null,
+  "estimates": [
+    {
+      "source": "infrastructure",
+      "reason": "no_file"
+    }
+  ],
+  "estimates_omitted": 0
+}
