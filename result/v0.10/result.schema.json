@@ -129,7 +129,7 @@
       "$ref": "#/$defs/data"
     },
     "estimates": {
-      "description": "The figures of the rows that are not an agent's: rows that state a cost source and name no agent, as an infrastructure estimate's rows do. One entry per currency, cost basis, source and charge period, then the estimate a workflow named that was not available. They stand apart from figures, cap, lifetime and policy, and nothing adds them to any of those, or one currency to another. A version 0.10 object states at least one entry.",
+      "description": "The figures of the estimate rows: rows that state a cost source, name no agent and state the basis estimate, as costroid ingest-run --from focus writes them from a workflow's own FOCUS cost file. One entry per currency, source and charge period, then the estimate a workflow named that was not available. They stand apart from figures, cap, lifetime and policy, and nothing adds them to any of those, or one currency to another. A version 0.10 object states at least one entry.",
       "type": "array",
       "minItems": 1,
       "maxItems": 21,
@@ -1216,7 +1216,7 @@
       ]
     },
     "estimateFigure": {
-      "description": "The exact sum of ListCost over the rows that share a currency, a cost basis, a source and a charge period. ingest-run --from focus writes every such row at the basis estimate.",
+      "description": "The exact sum of ListCost over the estimate rows that share a currency, a source and a charge period: rows that state a cost source, name no agent and state the basis estimate, as ingest-run --from focus writes them.",
       "type": "object",
       "properties": {
         "source": {
@@ -1234,7 +1234,8 @@
           "$ref": "#/$defs/instant"
         },
         "cost_basis": {
-          "$ref": "#/$defs/costBasis"
+          "description": "Always estimate. A figure of another basis is no estimate, and this array never holds one.",
+          "const": "estimate"
         },
         "list_cost": {
           "$ref": "#/$defs/decimal"
