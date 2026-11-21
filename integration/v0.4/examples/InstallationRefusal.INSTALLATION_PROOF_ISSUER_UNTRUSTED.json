@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INSTALLATION_PROOF_ISSUER_UNTRUSTED",
+    "message": "This version trusts no such issuer."
+  }
+}

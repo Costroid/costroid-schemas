@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "FILE_TOO_LARGE",
+    "message": "The body is larger than max_batch_bytes."
+  }
+}
