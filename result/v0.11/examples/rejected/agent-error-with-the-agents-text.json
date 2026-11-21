@@ -1,0 +1,80 @@
+{
+  "schema": "costroid.result/0.11",
+  "conclusion": null,
+  "state": "no_rows",
+  "reason": "empty_rows_file",
+  "run_reason": "agent_error",
+  "agent_error": {
+    "class": "authentication_failed",
+    "message": "Invalid API key"
+  },
+  "agent_skipped": null,
+  "head_sha": "",
+  "ci_run": {
+    "id": 19203384756,
+    "attempt": 1
+  },
+  "rows_sha256": null,
+  "rows_file_sha256": null,
+  "amounts": "shown",
+  "rows": 0,
+  "run_identity": "unverified",
+  "figures": [],
+  "figures_omitted": 0,
+  "cap": {
+    "currency": "USD",
+    "amount": "5",
+    "enforcement_grade": null,
+    "cost": null,
+    "cost_basis": null,
+    "remainder": null,
+    "overshoot": null,
+    "overshoot_tokens": null
+  },
+  "data": {
+    "agents": [],
+    "models": [],
+    "models_omitted": 0,
+    "catalog_versions": [],
+    "fallback_models": [],
+    "fallback_models_omitted": 0,
+    "fallback_price_ids": [],
+    "fallback_price_ids_omitted": 0
+  },
+  "lifetime": null,
+  "agent_stated": null,
+  "recorded": null,
+  "estimates": [
+    {
+      "source": "infrastructure",
+      "reason": "no_file"
+    }
+  ],
+  "estimates_omitted": 0,
+  "policy": {
+    "conclusion": "neutral",
+    "trust": "unverified",
+    "pack_sha256": "0a36ca52cf9123f580e21c44a00d804f62558b6c0f96179917521684e70c3f30",
+    "config_sha256": "d3cbc6bf0befd44c89f0089e36ad6998cc03013cd13de8e31bf49846be83d364",
+    "config_ref": "1111111111111111111111111111111111111111",
+    "config": "found",
+    "config_from_base": true,
+    "evaluated_at": "2026-11-20T09:00:00Z",
+    "warn_only": {
+      "active": false,
+      "reason": "ended",
+      "started": "2026-11-02T09:00:00Z",
+      "ends": "2026-11-09T09:00:00Z"
+    },
+    "results": [
+      {
+        "rule": "run_p95",
+        "outcome": "unproven",
+        "reason": "no_baseline",
+        "limit_factor": "1.5",
+        "baseline_runs": 7
+      }
+    ],
+    "joinable_rows": 0
+  }
+}
