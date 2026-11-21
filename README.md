@@ -19,6 +19,7 @@ Open, versioned contracts for [Costroid](https://github.com/Costroid/costroid), 
 | [`result/v0.9`](result/v0.9/README.md)           | One object per Costroid report: as v0.8, plus the figures OpenCode and Copilot CLI state, each in its own unit.              |
 | [`result/v0.10`](result/v0.10/README.md)         | One object per Costroid report: as v0.9, plus the infrastructure estimates, stated apart from the figures.                   |
 | [`result/v0.11`](result/v0.11/README.md)         | One object per Costroid report: as v0.10, plus the P95 limit, a multiple of the P95 of the agent's earlier runs.             |
+| [`result/v0.12`](result/v0.12/README.md)         | One object per Costroid report: as v0.11, plus the repository's own policy pack and its results.                             |
 | [`result/v0.6`](result/v0.6/README.md)           | The same object, before an agent's own figure and two run reasons.                                                           |
 | [`result/v0.5`](result/v0.5/README.md)           | The same object, before the rows' digests and the lifetime total.                                                            |
 | [`integration/v0.6`](integration/v0.6/README.md) | A merge fact graded only from a protected branch and stored with that branch, and repository names compared in lower case.   |
