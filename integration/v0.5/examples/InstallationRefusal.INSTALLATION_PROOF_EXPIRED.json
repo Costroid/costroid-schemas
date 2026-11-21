@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INSTALLATION_PROOF_EXPIRED",
+    "message": "The proof is outside its 600 second window, or older than the installation's last change."
+  }
+}

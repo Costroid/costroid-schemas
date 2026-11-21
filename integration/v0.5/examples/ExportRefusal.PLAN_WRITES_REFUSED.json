@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "PLAN_WRITES_REFUSED",
+    "message": "This tenant's plan does not allow writes at present. Nothing was stored."
+  }
+}

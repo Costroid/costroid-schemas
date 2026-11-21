@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INSTALLATION_PROOF_KEYS_UNAVAILABLE",
+    "message": "The issuer's key set cannot be read. Retry inside the proof's window."
+  }
+}

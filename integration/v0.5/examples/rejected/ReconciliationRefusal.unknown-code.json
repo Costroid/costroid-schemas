@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "MERGE_FACT_INVALID",
+    "message": "A merge refusal is not one of a reconciliation body's codes."
+  }
+}

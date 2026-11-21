@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "RUN_TOKEN_INVALID",
+    "message": "The run token is not valid for this tenant's rows audience."
+  }
+}

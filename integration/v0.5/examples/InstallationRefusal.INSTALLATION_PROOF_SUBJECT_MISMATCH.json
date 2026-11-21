@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INSTALLATION_PROOF_SUBJECT_MISMATCH",
+    "message": "The proof names another installation than the path."
+  }
+}

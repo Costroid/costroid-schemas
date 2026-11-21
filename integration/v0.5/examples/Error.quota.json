@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "QUOTA_EXPORTS_PER_DAY",
+    "message": "This batch would pass the tenant's exports_per_day limit."
+  }
+}

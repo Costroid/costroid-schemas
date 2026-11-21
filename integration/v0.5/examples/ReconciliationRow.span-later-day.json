@@ -1,0 +1,55 @@
+{
+  "source": "anthropic",
+  "credential": "svac_01Example",
+  "day": "2026-11-16",
+  "state": "matched",
+  "final": false,
+  "data_refreshed_at": "2026-11-17T06:00:00Z",
+  "currency": "USD",
+  "tokens": null,
+  "prices": [
+    {
+      "model": "example-large-1",
+      "tier": "standard",
+      "region": "global",
+      "class": "output",
+      "tokens": "500",
+      "provider_list": "0.0075",
+      "implied_unit_price": "15",
+      "catalog_unit_price": "15",
+      "sku_price_id": "anthropic/example-large-1/output/standard",
+      "match": true
+    }
+  ],
+  "dollars": {
+    "classes": null,
+    "verdict": "outside",
+    "ledger": "0",
+    "provider": "0.0075",
+    "provider_effective": "0.0075",
+    "provider_list": "0.0075",
+    "other_cost": "0",
+    "residual": "0.0075",
+    "causes": [
+      {
+        "name": "run_spans_days",
+        "amount": "0.0075"
+      }
+    ],
+    "unattributed": "0",
+    "rounding": {
+      "currency": "USD",
+      "rows": 0,
+      "variance": "0.0075",
+      "within": true
+    }
+  },
+  "span": {
+    "cause": "run_spans_days",
+    "from": "2026-11-15",
+    "to": "2026-11-16"
+  },
+  "notes": [
+    "a run crossed midnight UTC: this day's tokens are compared with 2026-11-15's as one, on that day's row"
+  ]
+}
