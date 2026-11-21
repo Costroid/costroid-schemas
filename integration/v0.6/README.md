@@ -63,7 +63,7 @@ The run requirement exists because a job chooses its own audience, and a file a 
 
 On GitHub, "Scheduled workflows will only run on the default branch" ([events reference](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows), retrieved 2026-11-01). A `push` can be to any branch, so it counts only with `ref_protected` `"true"`. An absent or `"false"` value answers `INSTALLATION_PROOF_UNPROTECTED_RUN`.
 
-GitHub's [OpenID configuration](https://token.actions.githubusercontent.com/.well-known/openid-configuration) lists `ref_protected` in `claims_supported` (retrieved 2026-11-01). The claim reference does not describe it. No real token has been read, so its value type is assumed to be a string, like every other GitHub claim.
+GitHub's [OpenID configuration](https://token.actions.githubusercontent.com/.well-known/openid-configuration) lists `ref_protected` in `claims_supported` (retrieved 2026-11-01). The claim reference does not describe it. A real token carried it as a string: a recorded GitHub Actions run 44907953360 (2026-11-21), a push to a branch that is not protected, printed `ref_protected` as the string `"false"`. The value `"true"` has not been read from a real token.
 
 Every other event is refused, whatever its `ref_protected`. A `workflow_dispatch` can name any branch. A `pull_request_target` run sits on the default branch, but a pull request starts it. A `pull_request` is refused the same way, from a fork or not.
 
@@ -384,7 +384,7 @@ A default branch that is not protected is another honest cause, beside the merge
 
 An `unverified` fact does not block the true one. When the same `merge_id` arrives under a token from a protected branch, [`examples/MergeRunTokenClaims.json`](examples/MergeRunTokenClaims.json), the `token_verified` fact replaces the `unverified` one by the rule that a verified fact replaces an unverified one. The answer is 201 with [`examples/MergeFact.protected-branch.json`](examples/MergeFact.protected-branch.json), whose `ref` is `refs/heads/main`.
 
-The claims on a push were read from a real token: a recorded GitHub Actions run 44894920019 (2026-11-21) printed `event_name` `push`, `ref` `refs/heads/main`, `ref_type` `branch`, and `sha` equal to the pushed commit and to `github.sha`. The claims of a `pull_request` `closed` run have not been read, and this contract does not rest on them: a fact sent from such a run reads `unverified` unless its token's `sha` is the merge commit.
+The claims on a push were read from a real token: a recorded GitHub Actions run 44894920019 (2026-11-21) printed `event_name` `push`, `ref` `refs/heads/main`, `ref_type` `branch`, and `sha` equal to the pushed commit and to `github.sha`. A second recorded run, 44907953360 (2026-11-21), printed `ref_protected` as the string `"false"` on a branch that is not protected; `"true"` has not been read from a real token. The claims of a `pull_request` `closed` run have not been read, and this contract does not rest on them: a fact sent from such a run reads `unverified` unless its token's `sha` is the merge commit.
 
 A GitLab job sends no run token, so its fact reads `unverified`, as its rows do.
 
