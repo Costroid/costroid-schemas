@@ -21,35 +21,13 @@
       "match": true
     }
   ],
-  "dollars": {
-    "classes": null,
-    "verdict": "outside",
-    "ledger": "0",
-    "provider": "0.0075",
-    "provider_effective": "0.0075",
-    "provider_list": "0.0075",
-    "other_cost": "0",
-    "residual": "0.0075",
-    "causes": [
-      {
-        "name": "run_spans_days",
-        "amount": "0.0075"
-      }
-    ],
-    "unattributed": "0",
-    "rounding": {
-      "currency": "USD",
-      "rows": 0,
-      "variance": "0.0075",
-      "within": true
-    }
-  },
+  "dollars": null,
   "span": {
     "cause": "run_spans_days",
     "from": "2026-11-15",
     "to": "2026-11-16"
   },
   "notes": [
-    "a run crossed midnight UTC: this day's tokens are compared with 2026-11-15's as one, on that day's row"
+    "a run crossed midnight UTC: this day's tokens and dollars are compared with 2026-11-15's as one, on that day's row"
   ]
 }

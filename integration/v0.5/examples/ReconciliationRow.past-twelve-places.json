@@ -1,0 +1,34 @@
+{
+  "source": "openai",
+  "credential": "proj_01Example",
+  "day": "2026-11-19",
+  "state": "matched",
+  "final": false,
+  "data_refreshed_at": null,
+  "currency": "USD",
+  "tokens": [
+    {
+      "class": "output",
+      "ledger": "800",
+      "provider": "800",
+      "delta": "0",
+      "within": true
+    }
+  ],
+  "prices": [],
+  "dollars": {
+    "classes": null,
+    "verdict": "within",
+    "ledger": "0.0016",
+    "provider": "0.0016000000000000001",
+    "provider_effective": "0.0016000000000000001",
+    "provider_list": null,
+    "other_cost": "0",
+    "residual": "0.0000000000000000001",
+    "causes": [],
+    "unattributed": "0.0000000000000000001",
+    "rounding": null
+  },
+  "span": null,
+  "notes": []
+}

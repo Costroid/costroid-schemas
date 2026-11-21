@@ -528,6 +528,20 @@
             }
           },
           "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": {
+            "description": "PLAN_WRITES_REFUSED: the tenant's plan does not allow writes at present. Nothing was stored. A sender keeps its document, warns, and never fails a check on this answer.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MergeRefusal" },
+                "examples": {
+                  "PLAN_WRITES_REFUSED": {
+                    "summary": "The plan refuses writes",
+                    "externalValue": "examples/MergeRefusal.PLAN_WRITES_REFUSED.json"
+                  }
+                }
+              }
+            }
+          },
           "403": {
             "description": "AUTH_TOKEN_SCOPE: the token lacks the merges:write scope. RUN_TOKEN_INVALID: Costroid-Run-Token is present and is not a GitHub Actions ID token for this tenant's rows audience inside its window, or its signature fails. RUN_TOKEN_OWNER_MISMATCH: the run token's repository_owner_id is not the owner of the installation in Costroid-Installation-Id.",
             "content": {
@@ -643,7 +657,7 @@
               },
               "examples": {
                 "body": {
-                  "summary": "Seven rows of two providers",
+                  "summary": "Eight rows of two providers",
                   "externalValue": "examples/ReconciliationRow.body.jsonl"
                 }
               }
@@ -658,7 +672,7 @@
                 "schema": { "$ref": "#/components/schemas/ReconciliationReceipt" },
                 "examples": {
                   "stored": {
-                    "summary": "Five rows stored, one unchanged and one ignored",
+                    "summary": "Six rows stored, one unchanged and one ignored",
                     "externalValue": "examples/ReconciliationReceipt.json"
                   }
                 }
@@ -672,6 +686,20 @@
             }
           },
           "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": {
+            "description": "PLAN_WRITES_REFUSED: the tenant's plan does not allow writes at present. Nothing was stored. A sender keeps the rows, warns, and never fails a check on this answer.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ReconciliationRefusal" },
+                "examples": {
+                  "PLAN_WRITES_REFUSED": {
+                    "summary": "The plan refuses writes",
+                    "externalValue": "examples/ReconciliationRefusal.PLAN_WRITES_REFUSED.json"
+                  }
+                }
+              }
+            }
+          },
           "403": {
             "description": "AUTH_TOKEN_SCOPE: the token lacks the reconciliations:write scope. RUN_TOKEN_INVALID: Costroid-Run-Token is present and is not a GitHub Actions ID token for this tenant's rows audience inside its window, or its signature fails. RUN_TOKEN_OWNER_MISMATCH: the run token's repository_owner_id is not the owner of the installation in Costroid-Installation-Id.",
             "content": {
@@ -1586,6 +1614,7 @@
         "description": "Every refusal of PUT /merges/{merge_id} that is not about the bearer. Each stores nothing.",
         "enum": [
           "AUTH_TOKEN_SCOPE",
+          "PLAN_WRITES_REFUSED",
           "INSTALLATION_NOT_BOUND",
           "RUN_TOKEN_INVALID",
           "RUN_TOKEN_OWNER_MISMATCH",
@@ -1613,14 +1642,26 @@
         "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
       },
       "Decimal": {
-        "description": "A decimal string, signed, with at most 26 integer digits and 12 fractional digits. Never a JSON number and never scientific notation.",
+        "description": "An amount: an optional leading minus, digits, and an optional point followed by 1 to 30 digits, at most 64 characters in all. No exponent and no leading plus. Never a JSON number. A provider's figure is carried as the provider states it, and a derived figure inherits its scale.",
         "type": "string",
-        "pattern": "^-?[0-9]{1,26}(\\.[0-9]{1,12})?$"
+        "maxLength": 64,
+        "pattern": "^-?[0-9]+(\\.[0-9]{1,30})?$"
       },
       "NonNegativeDecimal": {
-        "description": "A decimal string with at most 26 integer digits and 12 fractional digits. Never a JSON number and never scientific notation.",
+        "description": "An amount that is never negative: digits, and an optional point followed by 1 to 30 digits, at most 64 characters in all. No exponent and no sign. Never a JSON number.",
         "type": "string",
-        "pattern": "^[0-9]{1,26}(\\.[0-9]{1,12})?$"
+        "maxLength": 64,
+        "pattern": "^[0-9]+(\\.[0-9]{1,30})?$"
+      },
+      "TokenCount": {
+        "description": "A whole number of tokens: digits only, at most 20. Never a JSON number.",
+        "type": "string",
+        "pattern": "^[0-9]{1,20}$"
+      },
+      "TokenDelta": {
+        "description": "A difference of two token counts: an optional leading minus and digits only, at most 20 digits.",
+        "type": "string",
+        "pattern": "^-?[0-9]{1,20}$"
       },
       "Currency": {
         "description": "An ISO 4217 code.",
@@ -1670,14 +1711,14 @@
         "required": ["class", "ledger", "provider", "delta", "within"],
         "properties": {
           "class": { "$ref": "#/components/schemas/ComparedClass" },
-          "ledger": { "$ref": "#/components/schemas/NonNegativeDecimal" },
-          "provider": { "$ref": "#/components/schemas/NonNegativeDecimal" },
-          "delta": { "$ref": "#/components/schemas/Decimal" },
+          "ledger": { "$ref": "#/components/schemas/TokenCount" },
+          "provider": { "$ref": "#/components/schemas/TokenCount" },
+          "delta": { "$ref": "#/components/schemas/TokenDelta" },
           "within": { "type": "boolean" }
         }
       },
       "PriceCheck": {
-        "description": "One price proved: the cost report's list figure for one model's class on the day, over the usage report's tokens for the same model and class. Unit prices are per million tokens. match holds when tokens at catalog_unit_price land within one unit of the last digit the report states.",
+        "description": "One price proved: the cost report's list figure for one model's class on the day, over the usage report's tokens for the same model and class. Amounts are in the row's currency, and unit prices are per million tokens. match holds when tokens at catalog_unit_price land within one unit of the last digit the report states.",
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -1701,7 +1742,7 @@
             "$ref": "#/components/schemas/ComparedClass",
             "not": { "const": "cache_write" }
           },
-          "tokens": { "$ref": "#/components/schemas/NonNegativeDecimal" },
+          "tokens": { "$ref": "#/components/schemas/TokenCount" },
           "provider_list": { "$ref": "#/components/schemas/Decimal" },
           "implied_unit_price": {
             "description": "provider_list over tokens, per million tokens, rounded to six places. Null when tokens is zero. No verdict reads it.",
@@ -1736,7 +1777,7 @@
         }
       },
       "RoundingCheck": {
-        "description": "FOCUS 1.4's rounding variance tolerance applied to provider_list against the ledger's list cost. variance is provider_list minus ledger. within holds when the variance is inside MAX(100 × Subunit, SQRT(rows) × 0.5 × Subunit), inclusive.",
+        "description": "FOCUS 1.4's rounding variance tolerance applied to provider_list against the ledger's list cost. currency equals the row's currency. variance is provider_list minus ledger. within holds when the variance is inside MAX(100 × Subunit, SQRT(rows) × 0.5 × Subunit), inclusive.",
         "type": "object",
         "additionalProperties": false,
         "required": ["currency", "rows", "variance", "within"],
@@ -1752,7 +1793,7 @@
         }
       },
       "DollarCheck": {
-        "description": "List-price ledger cost against the cost report for the day. residual is provider minus ledger, and it equals the sum of causes and unattributed. Every amount is in the row's currency.",
+        "description": "List-price ledger cost against the cost report: for the day, or on a span's first day for every day of the span together. residual is provider minus ledger, and it equals the sum of causes and unattributed. Every amount is in the row's currency.",
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -1770,7 +1811,7 @@
         ],
         "properties": {
           "classes": {
-            "description": "Each class at list price. Null when the report does not split token cost by class, on a no_bill day, and on a later day of a span, whose first day holds the classes of every day in it.",
+            "description": "Each class at list price. Null when the report does not split token cost by class, and on a no_bill day.",
             "oneOf": [
               { "type": "array", "items": { "$ref": "#/components/schemas/ClassDollars" } },
               { "type": "null" }
@@ -1810,7 +1851,7 @@
         }
       },
       "Span": {
-        "description": "The days a run crossed midnight UTC over, compared as one because a day of them missed on its own and together they matched. The row of from holds the joined token comparison and the joined classes, and the rows of later days hold neither.",
+        "description": "The days a run crossed midnight UTC over, compared as one because a day of them missed on its own and together they matched. They are compared as one for dollars as for tokens. The row of from holds the joined token comparison and the joined dollar comparison. Each later day's row carries the span and the span's state, with tokens and dollars null, and reads by the row of from.",
         "type": "object",
         "additionalProperties": false,
         "required": ["cause", "from", "to"],
@@ -1821,7 +1862,7 @@
         }
       },
       "ReconciliationRow": {
-        "description": "One reconciliation of one credential on one UTC day, as costroid reconcile --out writes it, with currency. source, credential and day are its key. Every amount is a decimal string. A pending row carries no figure.",
+        "description": "One reconciliation of one credential on one UTC day, as costroid reconcile --out writes it, with currency. source, credential and day are its key. Every amount is a decimal string. A pending row carries no figure, and a later day of a span carries no tokens or dollars of its own.",
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -1858,11 +1899,11 @@
             ]
           },
           "currency": {
-            "description": "The currency of every amount in dollars.",
+            "description": "The currency of every amount in the row, prices included. Where dollars.rounding is present, its currency equals this one.",
             "$ref": "#/components/schemas/Currency"
           },
           "tokens": {
-            "description": "One check per class either side holds. Null when no class was compared on this row's own day: on a pending row, on a later day of a span, and on a day neither side holds tokens.",
+            "description": "One check per class either side holds. Null on a pending row, on a later day of a span, and on a day neither side holds tokens.",
             "oneOf": [
               { "type": "array", "items": { "$ref": "#/components/schemas/TokenCheck" } },
               { "type": "null" }
@@ -1876,7 +1917,7 @@
             ]
           },
           "dollars": {
-            "description": "Null when the row holds no dollar comparison, as on a pending row.",
+            "description": "Null when the row holds no dollar comparison: on a pending row, and on a later day of a span.",
             "oneOf": [{ "$ref": "#/components/schemas/DollarCheck" }, { "type": "null" }]
           },
           "span": {
@@ -1888,15 +1929,43 @@
             "items": { "type": "string", "minLength": 1 }
           }
         },
-        "if": { "properties": { "state": { "const": "pending" } } },
-        "then": {
-          "properties": {
-            "tokens": { "type": "null" },
-            "prices": { "type": "null" },
-            "dollars": { "type": "null" },
-            "span": { "type": "null" }
+        "allOf": [
+          {
+            "description": "A pending row carries no figure.",
+            "if": { "properties": { "state": { "const": "pending" } } },
+            "then": {
+              "properties": {
+                "tokens": { "type": "null" },
+                "prices": { "type": "null" },
+                "dollars": { "type": "null" },
+                "span": { "type": "null" }
+              }
+            }
+          },
+          {
+            "description": "A row with a span is its first day, with the joined tokens and dollars, or a later day, with neither.",
+            "if": {
+              "required": ["span"],
+              "properties": { "span": { "type": "object" } }
+            },
+            "then": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "tokens": { "type": "array" },
+                    "dollars": { "type": "object" }
+                  }
+                },
+                {
+                  "properties": {
+                    "tokens": { "type": "null" },
+                    "dollars": { "type": "null" }
+                  }
+                }
+              ]
+            }
           }
-        }
+        ]
       },
       "ReconciliationReceipt": {
         "description": "What a stored body did, line by line. stored: the row is new, or replaced the stored row of its key. unchanged: the stored row of its key is equal to it. ignored: the stored row is final and this one is not, or this row's data_refreshed_at is earlier than the stored row's.",
@@ -1958,6 +2027,7 @@
         "description": "Every refusal of PUT /reconciliations that is not about the bearer or a quota. Each stores nothing.",
         "enum": [
           "AUTH_TOKEN_SCOPE",
+          "PLAN_WRITES_REFUSED",
           "INSTALLATION_NOT_BOUND",
           "RUN_TOKEN_INVALID",
           "RUN_TOKEN_OWNER_MISMATCH",

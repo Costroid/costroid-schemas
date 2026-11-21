@@ -93,11 +93,11 @@
     ],
     "verdict": "within",
     "ledger": "0.11217",
-    "provider": "0.1123200000001",
+    "provider": "0.11232",
     "provider_effective": "0.11232",
     "provider_list": "0.11232",
     "other_cost": "0",
-    "residual": "0.00015",
+    "residual": "+0.00015",
     "causes": [],
     "unattributed": "0.00015",
     "rounding": {

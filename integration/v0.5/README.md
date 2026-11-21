@@ -349,7 +349,7 @@ The recommended sender is a job on a push to the default branch, not a job on a 
 - A `pull_request` run takes its workflow file from the pull request's merge ref, `refs/pull/<number>/merge` ([events reference](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows), retrieved 2026-11-01), so the pull request's author decides what its job sends. A push to the default branch runs the default branch's file.
 - On a push, the run token's `sha` claim is the pushed commit, so the platform can hold `merge_commit_sha` to it.
 
-The sender reads the pushed commit, asks the host which merged pull requests that commit closed, and sends one fact per pull request. A commit that closed none sends nothing. Costroid's `costroid merged` is one such sender, run by a recipe on a push to the default branch with `id-token: write`.
+The sender reads the pushed commit, asks the host which merged pull requests that commit closed, and sends one fact per pull request. A commit that closed none sends nothing. In releases after 1.0.0-alpha.26, Costroid's sender is `costroid merged`, run by a recipe on a push to the default branch with `id-token: write`.
 
 `Costroid-Installation-Id` and `Costroid-Run-Token` are sent as on an export, and the run token has the same rows audience. The platform verifies it under [The run token](#the-run-token) and reads three more claims on this path: `sha`, `ref` and `ref_type`.
 
@@ -383,6 +383,7 @@ A request is refused before anything is stored.
 | Code                           | Status | Meaning                                                                                                                |
 | ------------------------------ | ------ | ---------------------------------------------------------------------------------------------------------------------- |
 | `AUTH_TOKEN_INVALID`           | 401    | The token is absent, unknown, expired or revoked                                                                       |
+| `PLAN_WRITES_REFUSED`          | 402    | The tenant's plan does not allow writes at present                                                                     |
 | `AUTH_TOKEN_SCOPE`             | 403    | The token lacks `merges:write`                                                                                         |
 | `RUN_TOKEN_INVALID`            | 403    | The run token fails verification                                                                                       |
 | `RUN_TOKEN_OWNER_MISMATCH`     | 403    | The run token names another owner than the installation                                                                |
@@ -391,30 +392,32 @@ A request is refused before anything is stored.
 | `MERGE_FACT_IDENTITY_MISMATCH` | 422    | A verified run token names another repository than `repo`                                                              |
 | `MERGE_FACT_INVALID`           | 422    | A key is missing, unknown or of the wrong form                                                                         |
 
+A sender that meets 402 keeps its document and warns. It never fails a check on that answer, because nothing in the document is wrong and it can be sent later.
+
 ## The reconciliation result
 
 `PUT /reconciliations` sends a sender's comparison of its rows with a provider's usage and cost reports, one row per source, credential and UTC day.
 
 ### What it says
 
-Costroid's `costroid reconcile --out` already writes one such row per source, credential and day, and a rerun replaces it. This contract carries that row as it is, with one key added, `currency`. It defines no second, smaller shape that could disagree with the first. [`examples/ReconciliationRow.json`](examples/ReconciliationRow.json) is one row, and [`examples/ReconciliationRow.body.jsonl`](examples/ReconciliationRow.body.jsonl) is a body of seven.
+Costroid's `costroid reconcile --out` already writes one such row per source, credential and day, and a rerun replaces it. This contract carries that row as it is, with one key added, `currency`. It defines no second, smaller shape that could disagree with the first. [`examples/ReconciliationRow.json`](examples/ReconciliationRow.json) is one row, and [`examples/ReconciliationRow.body.jsonl`](examples/ReconciliationRow.body.jsonl) is a body of eight.
 
 The body is `application/x-ndjson`: one row per line, each line ended by a line feed.
 
-| Key                 | What it holds                                                                                                                                 |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `source`            | The provider whose reports the row was compared with. Costroid writes `anthropic` or `openai`                                                 |
-| `credential`        | The rows' `SubAccountId`: the key, workspace, project or service account they spent on                                                        |
-| `day`               | A UTC day, `YYYY-MM-DD`                                                                                                                       |
-| `state`             | `matched`, `tokens_miss`, `price_miss` or `pending`: the verdict on tokens and prices                                                         |
-| `final`             | False while the provider can still restate the day, through the eighth day after the day's month ends                                         |
-| `data_refreshed_at` | The provider's freshness stamp on the reports that carried the day, the earliest when several did, in UTC. Null when the provider stamps none |
-| `currency`          | The currency of every amount in `dollars`, as an ISO 4217 code                                                                                |
-| `tokens`            | One check per token class: the rows' count, the provider's, the difference and whether it is within 1%                                        |
-| `prices`            | One check per model, tier, region and class: the unit price the cost report implies, per million tokens, against the catalog's                |
-| `dollars`           | List-price dollars against the cost report for the day: the verdict, the figures, the residual and its named causes                           |
-| `span`              | The days a run crossed midnight UTC over, when they were compared as one                                                                      |
-| `notes`             | Sentences for people                                                                                                                          |
+| Key                 | What it holds                                                                                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `source`            | The provider whose reports the row was compared with. Costroid writes `anthropic` or `openai`                                                                       |
+| `credential`        | The rows' `SubAccountId`: the key, workspace, project or service account they spent on                                                                              |
+| `day`               | A UTC day, `YYYY-MM-DD`                                                                                                                                             |
+| `state`             | `matched`, `tokens_miss`, `price_miss` or `pending`: the verdict on tokens and prices                                                                               |
+| `final`             | False while the provider can still restate the day, through the eighth day after the day's month ends                                                               |
+| `data_refreshed_at` | The provider's freshness stamp on the reports that carried the day, the earliest when several did, in UTC. Null when the provider stamps none                       |
+| `currency`          | The currency of every amount in the row, `prices` included, as an ISO 4217 code                                                                                     |
+| `tokens`            | One check per token class: the rows' count, the provider's, the difference and whether it is within 1%                                                              |
+| `prices`            | One check per model, tier, region and class on the row's own day: the unit price the cost report implies, per million tokens, against the catalog's                 |
+| `dollars`           | List-price dollars against the cost report for the day, or for a span's days together on its first day: the verdict, the figures, the residual and its named causes |
+| `span`              | The days a run crossed midnight UTC over, compared as one for tokens and dollars                                                                                    |
+| `notes`             | Sentences for people                                                                                                                                                |
 
 The key is `source`, `credential` and `day`.
 
@@ -427,11 +430,15 @@ The key is `source`, `credential` and `day`.
 | `price_miss`  | Every class matched, and a price missed the catalog. It is a defect                                                                                                                                                   |
 | `pending`     | The provider has not finished reporting the day, or a run on the credential crossed midnight UTC into a day that cannot be compared yet. The row carries no figure: `tokens`, `prices`, `dollars` and `span` are null |
 
-`dollars.verdict` is one of `within`, `outside` and `no_bill`, and the list is closed. `within` means the day's list-price dollars landed within 10% of the cost report. `no_bill` means every row was list-equivalent, so no bill exists to compare with. `dollars` is null when the row holds no dollar comparison, as on a `pending` row.
+`dollars.verdict` is one of `within`, `outside` and `no_bill`, and the list is closed. `within` means the day's list-price dollars landed within 10% of the cost report. `no_bill` means every row was list-equivalent, so no bill exists to compare with. `dollars` is null when the row holds no dollar comparison: on a `pending` row, and on a later day of a span.
+
+A run that crosses midnight UTC puts all its tokens on its first day in the rows, while the provider dates each request by when it was served. When a day misses on its own and the days the run spans match together, those days are compared as one, for dollars as for tokens. The row of the span's first day holds the joined token comparison and the joined dollar comparison: its `dollars` are over the span's days together. Each later day's row carries `span` and the span's `state`, with `tokens` and `dollars` null, so no later day reads `outside` on its own. Each day's row keeps its own `prices`, and the span's `state` is `price_miss` when a price misses on any of its days. [`examples/ReconciliationRow.span-first-day.json`](examples/ReconciliationRow.span-first-day.json) and [`examples/ReconciliationRow.span-later-day.json`](examples/ReconciliationRow.span-later-day.json) are the two days of one span.
 
 The causes of a residual are closed too: `shared_key`, `tier`, `residency`, `contract_rate` and `run_spans_days`. `dollars.residual` is the provider's figure minus the rows', and it equals the sum of `causes` and `unattributed`. The token classes are the row contract's billed classes, plus `cache_write`, the writes of every lifetime compared as one figure where the rows cannot see a write's lifetime.
 
-Every amount is a decimal string with at most 12 fractional digits, never a JSON number. A difference or a provider's figure can be negative. Token counts are decimal strings too. `currency` is new: the row `reconcile` wrote before this version has no such key, and Costroid adds it with this version.
+Every amount is a decimal string, never a JSON number: an optional leading minus, digits, and an optional point followed by 1 to 30 digits, at most 64 characters in all, with no exponent and no leading plus. A provider's figure is carried as the provider states it, and nothing is rounded. A derived figure, such as a delta or a residual, inherits its scale. The one exception is `implied_unit_price`, rounded to six places, which no verdict reads. A token count is a whole number written in digits only, at most 20 of them, and a difference of two counts may carry a leading minus.
+
+`currency` is the currency of every amount in the row, `prices` included. Where `dollars.rounding` is present, its `currency` equals the row's. The schema's dialect cannot compare two values, so `openapi.json` does not check it, and a row that breaks it is not a row of this version. `currency` is new: the row `reconcile` wrote before this version has no such key, and Costroid adds it with this version.
 
 [Compare a ledger with a provider's report](https://github.com/Costroid/costroid/blob/main/docs/reconcile.md) is how Costroid computes each key.
 
@@ -451,7 +458,7 @@ The platform does not read the provider's report. A reconciliation result is the
 
 The run token is optional. It proves only which run sent the body. A sender that sends it sends `Costroid-Installation-Id` beside it, and the platform checks both as on an export. The job that reconciles is a scheduled job where the provider's admin key lives, not a pull request's job.
 
-Costroid's `costroid reconcile --export` is one such sender. It sends what `--out` writes.
+In releases after 1.0.0-alpha.26, Costroid's sender is `costroid reconcile --export`. It sends what `--out` writes.
 
 ### How a reader joins it to a pull request
 
@@ -461,6 +468,8 @@ A pull request's rows fall in one or more credential-days: their `SubAccountId`,
 - `not reconciled` when any is `tokens_miss`, `price_miss` or `outside`;
 - `pending` otherwise, a missing result included.
 
+A later day of a span reads by its first day's row, the row of `span.from`. When that row is not stored, because it was sent in another body or not sent, the later day reads `pending`. A reader never takes a later row's `state` alone as the verdict, because the dollar verdict lives only on the first row.
+
 `no_bill` is compatible with reconciled: dollars are compared only where a bill exists. A reader that shows `final` uses four readings: "Reconciled", "Reconciled, provisional" (all matched, at least one day not final), "Not reconciled" and "Pending". Each is a stated value: the tenant's own job said it, and the reader shows who sent it and when.
 
 A result is about a credential's whole day, not one pull request. On a key several runs share, `matched` says all their rows together match the provider. A `matched` row with `final` false can still move.
@@ -469,13 +478,13 @@ A result is about a credential's whole day, not one pull request. On a key sever
 
 `GET /quotas` states each limit, and the first four can only rise.
 
-| Quota                           | Limit             | Bounds                                                   |
-| ------------------------------- | ----------------- | -------------------------------------------------------- |
-| `max_reconciliation_lines`      | 500               | The lines of one body                                    |
-| `max_reconciliation_bytes`      | 1,048,576         | One body, in bytes                                       |
-| `max_reconciliation_line_bytes` | 16,384            | One line, in bytes                                       |
-| `reconciliations_per_day`       | Stated per tenant | The bodies stored in a UTC day, beside `exports_per_day` |
-| `max_reconciliation_range_days` | 92                | The days one `GET /reconciliations` spans                |
+| Quota                           | Limit     | Bounds                                                                                           |
+| ------------------------------- | --------- | ------------------------------------------------------------------------------------------------ |
+| `max_reconciliation_lines`      | 500       | The lines of one body                                                                            |
+| `max_reconciliation_bytes`      | 1,048,576 | One body, in bytes                                                                               |
+| `max_reconciliation_line_bytes` | 16,384    | One line, in bytes                                                                               |
+| `reconciliations_per_day`       | 48        | The bodies stored in a UTC day, two sends an hour from a scheduled job, beside `exports_per_day` |
+| `max_reconciliation_range_days` | 92        | The days one `GET /reconciliations` spans                                                        |
 
 A body past the first three answers 413 `RECONCILIATION_TOO_LARGE` and stores nothing.
 
@@ -486,6 +495,7 @@ A request is refused before anything is stored.
 | Code                            | Status | Meaning                                                                                       |
 | ------------------------------- | ------ | --------------------------------------------------------------------------------------------- |
 | `AUTH_TOKEN_INVALID`            | 401    | The token is absent, unknown, expired or revoked                                              |
+| `PLAN_WRITES_REFUSED`           | 402    | The tenant's plan does not allow writes at present                                            |
 | `AUTH_TOKEN_SCOPE`              | 403    | The token lacks `reconciliations:write`                                                       |
 | `RUN_TOKEN_INVALID`             | 403    | The run token fails verification                                                              |
 | `RUN_TOKEN_OWNER_MISMATCH`      | 403    | The run token names another owner than the installation                                       |
@@ -494,13 +504,15 @@ A request is refused before anything is stored.
 | `RECONCILIATION_INVALID`        | 422    | A line is not a row of this version. The answer names the line                                |
 | `QUOTA_RECONCILIATIONS_PER_DAY` | 429    | The body would pass `reconciliations_per_day`, under [Quota signals](#quota-signals)          |
 
+A sender that meets 402 keeps the rows and warns. It never fails a check on that answer, because nothing in the rows is wrong and they can be sent later.
+
 ## Quota signals
 
 `GET /quotas` answers every limit that applies to the tenant. Each export answer also carries `Costroid-Quota-State`, the most urgent state across them: `ok`, `approaching` at 80% of a limit, or `exhausted`.
 
 Three quotas bound exports. `exports_per_day` counts the batches accepted for ingest in a UTC day, restatements included, and a repeat of bytes already held is not counted. `export_bytes_per_day` sums their bodies in bytes. `max_batch_bytes` bounds one body in bytes.
 
-Five bound reconciliations, under [Limits](#limits). Merge facts have no quota in this version.
+Five bound reconciliations, under [Limits](#limits). There is no quota on merge facts, because the number of merges bounds them.
 
 A refused export answers 429 with `Retry-After` and an error code named after the quota, such as `QUOTA_EXPORTS_PER_DAY`, and stores nothing. A refused reconciliation body does the same. A quota refusal never changes a check conclusion, and the sender keeps the rows and retries.
 
@@ -510,6 +522,7 @@ A refused export answers 429 with `Retry-After` and an error code named after th
 - `PUT` and `GET /merges/{merge_id}` carry one fact per merged pull request, graded `token_verified` or `unverified`, under [The merge fact](#the-merge-fact).
 - `PUT` and `GET /reconciliations` carry `costroid reconcile --out`'s row with `currency` added, under [The reconciliation result](#the-reconciliation-result).
 - Two scopes, `merges:write` and `reconciliations:write`.
+- `PLAN_WRITES_REFUSED` answers both `PUT`s, as on an export.
 - Five refusals: `MERGE_FACT_CONFLICT`, `MERGE_FACT_IDENTITY_MISMATCH`, `MERGE_FACT_INVALID`, `RECONCILIATION_INVALID` and `RECONCILIATION_TOO_LARGE`. An unknown merge id answers 404 `MERGE_FACT_NOT_FOUND`.
 - Five quotas in `GET /quotas`: `reconciliations_per_day`, `max_reconciliation_lines`, `max_reconciliation_bytes`, `max_reconciliation_line_bytes` and `max_reconciliation_range_days`.
 - No answer of version 0.4 changes.
