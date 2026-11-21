@@ -286,14 +286,18 @@ function checkExternalValue(path, value) {
 }
 
 function checkRefusalCoverage(directory, document) {
-  const codes = document.components.schemas.InstallationRefusalCode?.enum ?? []
   const contractText = JSON.stringify(document.paths)
   const rejected = readdirSync(join(directory, 'examples', 'rejected'))
-  for (const code of codes) {
-    const example = join('examples', `InstallationRefusal.${code}.json`)
-    if (!contractText.includes(example)) report(directory, `${code} has no example in openapi.json`)
-    if (!rejected.some((name) => name.split('.')[1] === code))
-      report(directory, `${code} has no negative example`)
+  for (const [name, schema] of Object.entries(document.components.schemas)) {
+    if (!name.endsWith('RefusalCode')) continue
+    const component = name.slice(0, -'Code'.length)
+    for (const code of schema.enum ?? []) {
+      const example = join('examples', `${component}.${code}.json`)
+      if (!contractText.includes(example))
+        report(directory, `${component} ${code} has no example in openapi.json`)
+      if (name === 'InstallationRefusalCode' && !rejected.some((file) => file.split('.')[1] === code))
+        report(directory, `${code} has no negative example`)
+    }
   }
 }
 

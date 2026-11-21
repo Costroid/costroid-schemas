@@ -26,7 +26,7 @@ Commit messages use the imperative mood and say what changed and why.
 
 - A published version directory is never edited. A change is a new directory.
 - Every schema has examples. `examples/` must pass and `examples/rejected/` must fail.
-- Amounts are decimal strings, at most 12 fractional digits, never JSON numbers.
+- Amounts are decimal strings, at most 12 fractional digits, never JSON numbers. One exception: an amount in a reconciliation row of `integration/v0.5` carries up to 30, because a provider's figure is passed on as the provider states it.
 - An external fact carries its source URL and retrieval date.
 - Example names and figures are synthetic. Say so.
 - No platform code enters this repository. The contract is the only dependency between the products.

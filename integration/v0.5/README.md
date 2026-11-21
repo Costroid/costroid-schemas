@@ -346,8 +346,8 @@ The answer of a `PUT` that stores, of one that changes nothing, and of `GET` is 
 
 The recommended sender is a job on a push to the default branch, not a job on a pull request's `closed` event:
 
-- A `pull_request` run takes its workflow file from the pull request's merge ref, `refs/pull/<number>/merge` ([events reference](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows), retrieved 2026-11-01), so the pull request's author decides what its job sends. A push to the default branch runs the default branch's file.
-- On a push, the run token's `sha` claim is the pushed commit, so the platform can hold `merge_commit_sha` to it.
+- GitHub runs a `pull_request` workflow "in the context of the merge commit", on the pull request's merge ref `refs/pull/<number>/merge` ([events reference](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows), retrieved 2026-11-21). The workflow file it runs carries the pull request's changes, so the pull request's author decides what its job sends. A push to the default branch runs the default branch's file.
+- On a push, `GITHUB_SHA` is the "Tip commit pushed to the ref" (the same page), and the run token's `sha` claim is that commit, so the platform can hold `merge_commit_sha` to it.
 
 The sender reads the pushed commit, asks the host which merged pull requests that commit closed, and sends one fact per pull request. A commit that closed none sends nothing. In releases after 1.0.0-alpha.26, Costroid's sender is `costroid merged`, run by a recipe on a push to the default branch with `id-token: write`.
 
