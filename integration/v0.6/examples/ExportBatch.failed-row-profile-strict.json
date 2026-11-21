@@ -1,0 +1,14 @@
+{
+  "batch_id": "903114-16873409925-1",
+  "installation_id": "github-owner:7204411",
+  "status": "failed",
+  "sha256": "3f7a9c10d2e84b6655a1c0f97e2d4b18c6a35f0e9d7b2c41a8e6f3051d9c7b24",
+  "focus_version": "1.4",
+  "received_at": "2026-10-14T10:52:19Z",
+  "rows": null,
+  "dropped_tag_keys": null,
+  "failure": {
+    "code": "ROW_PROFILE_STRICT",
+    "message": "11 row(s) carry x_CostroidMeasuredCost, the strict profile. Send default rows, which keep the figure in EffectiveCost."
+  }
+}

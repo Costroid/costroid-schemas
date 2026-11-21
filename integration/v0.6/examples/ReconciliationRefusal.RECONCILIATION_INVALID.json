@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "RECONCILIATION_INVALID",
+    "message": "Line 3: dollars.ledger is a JSON number, and every amount is a decimal string.",
+    "line": 3
+  }
+}

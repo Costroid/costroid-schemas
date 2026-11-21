@@ -1,0 +1,36 @@
+{
+  "source": "anthropic",
+  "credential": "apikey_02Example",
+  "day": "2026-11-18",
+  "state": "matched",
+  "final": false,
+  "data_refreshed_at": "2026-11-20T15:30:11Z",
+  "currency": "USD",
+  "tokens": [
+    {
+      "class": "output",
+      "ledger": "3000",
+      "provider": "3000",
+      "delta": "0",
+      "within": true
+    }
+  ],
+  "prices": [],
+  "dollars": {
+    "classes": null,
+    "verdict": "no_bill",
+    "ledger": "0.045",
+    "provider": "0",
+    "provider_effective": "0",
+    "provider_list": null,
+    "other_cost": "0",
+    "residual": "0",
+    "causes": [],
+    "unattributed": "0",
+    "rounding": null
+  },
+  "span": null,
+  "notes": [
+    "every ledger row is list-equivalent, so no API bill exists to compare"
+  ]
+}

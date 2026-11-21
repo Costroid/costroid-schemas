@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "EXPORT_BATCH_BUSY",
+    "message": "A merge fact has no batch, so an export refusal is not one of its codes."
+  }
+}

@@ -1,0 +1,197 @@
+{
+  "rows": [
+    {
+      "row": {
+        "source": "anthropic",
+        "credential": "apikey_01Example",
+        "day": "2026-11-17",
+        "state": "price_miss",
+        "final": false,
+        "data_refreshed_at": "2026-11-19T07:12:40Z",
+        "currency": "USD",
+        "tokens": [
+          {
+            "class": "input_uncached",
+            "ledger": "10000",
+            "provider": "10000",
+            "delta": "0",
+            "within": true
+          }
+        ],
+        "prices": [
+          {
+            "model": "example-large-1",
+            "tier": "standard",
+            "region": "global",
+            "class": "input_uncached",
+            "tokens": "10000",
+            "provider_list": "0.0301",
+            "implied_unit_price": "3.01",
+            "catalog_unit_price": "3",
+            "sku_price_id": "anthropic/example-large-1/input_uncached/standard",
+            "match": false
+          }
+        ],
+        "dollars": {
+          "classes": [
+            {
+              "class": "input_uncached",
+              "ledger": "0.03",
+              "provider": "0.0301",
+              "delta": "0.0001",
+              "within": true
+            }
+          ],
+          "verdict": "within",
+          "ledger": "0.03",
+          "provider": "0.028595",
+          "provider_effective": "0.028595",
+          "provider_list": "0.0301",
+          "other_cost": "0",
+          "residual": "-0.001405",
+          "causes": [
+            {
+              "name": "contract_rate",
+              "amount": "-0.001505"
+            }
+          ],
+          "unattributed": "0.0001",
+          "rounding": {
+            "currency": "USD",
+            "rows": 4,
+            "variance": "0.0001",
+            "within": true
+          }
+        },
+        "span": null,
+        "notes": [
+          "a price the report implies missed the catalog past the report's last stated digit: this is a defect"
+        ]
+      },
+      "received_at": "2026-11-19T09:00:42Z",
+      "token_id": "tok_01JEXAMPLE0002",
+      "run": null
+    },
+    {
+      "row": {
+        "source": "anthropic",
+        "credential": "apikey_01Example",
+        "day": "2026-11-18",
+        "state": "matched",
+        "final": false,
+        "data_refreshed_at": "2026-11-20T15:30:11Z",
+        "currency": "USD",
+        "tokens": [
+          {
+            "class": "input_uncached",
+            "ledger": "1840",
+            "provider": "1840",
+            "delta": "0",
+            "within": true
+          },
+          {
+            "class": "cache_read",
+            "ledger": "120000",
+            "provider": "120000",
+            "delta": "0",
+            "within": true
+          },
+          {
+            "class": "output",
+            "ledger": "4710",
+            "provider": "4720",
+            "delta": "10",
+            "within": true
+          }
+        ],
+        "prices": [
+          {
+            "model": "example-large-1",
+            "tier": "standard",
+            "region": "global",
+            "class": "cache_read",
+            "tokens": "120000",
+            "provider_list": "0.036",
+            "implied_unit_price": "0.3",
+            "catalog_unit_price": "0.3",
+            "sku_price_id": "anthropic/example-large-1/cache_read/standard",
+            "match": true
+          },
+          {
+            "model": "example-large-1",
+            "tier": "standard",
+            "region": "global",
+            "class": "input_uncached",
+            "tokens": "1840",
+            "provider_list": "0.00552",
+            "implied_unit_price": "3",
+            "catalog_unit_price": "3",
+            "sku_price_id": "anthropic/example-large-1/input_uncached/standard",
+            "match": true
+          },
+          {
+            "model": "example-large-1",
+            "tier": "standard",
+            "region": "global",
+            "class": "output",
+            "tokens": "4720",
+            "provider_list": "0.0708",
+            "implied_unit_price": "15",
+            "catalog_unit_price": "15",
+            "sku_price_id": "anthropic/example-large-1/output/standard",
+            "match": true
+          }
+        ],
+        "dollars": {
+          "classes": [
+            {
+              "class": "input_uncached",
+              "ledger": "0.00552",
+              "provider": "0.00552",
+              "delta": "0",
+              "within": true
+            },
+            {
+              "class": "cache_read",
+              "ledger": "0.036",
+              "provider": "0.036",
+              "delta": "0",
+              "within": true
+            },
+            {
+              "class": "output",
+              "ledger": "0.07065",
+              "provider": "0.0708",
+              "delta": "0.00015",
+              "within": true
+            }
+          ],
+          "verdict": "within",
+          "ledger": "0.11217",
+          "provider": "0.11232",
+          "provider_effective": "0.11232",
+          "provider_list": "0.11232",
+          "other_cost": "0",
+          "residual": "0.00015",
+          "causes": [],
+          "unattributed": "0.00015",
+          "rounding": {
+            "currency": "USD",
+            "rows": 12,
+            "variance": "0.00015",
+            "within": true
+          }
+        },
+        "span": null,
+        "notes": []
+      },
+      "received_at": "2026-11-21T09:00:37Z",
+      "token_id": "tok_01JEXAMPLE0002",
+      "run": {
+        "repository": "example/widgets",
+        "run_id": "16990412207",
+        "run_attempt": "1"
+      }
+    }
+  ]
+}

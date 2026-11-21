@@ -1,0 +1,111 @@
+{
+  "source": "anthropic",
+  "credential": "apikey_01Example",
+  "day": "2026-11-18",
+  "state": "matched",
+  "data_refreshed_at": "2026-11-20T15:30:11Z",
+  "currency": "USD",
+  "tokens": [
+    {
+      "class": "input_uncached",
+      "ledger": "1840",
+      "provider": "1840",
+      "delta": "0",
+      "within": true
+    },
+    {
+      "class": "cache_read",
+      "ledger": "120000",
+      "provider": "120000",
+      "delta": "0",
+      "within": true
+    },
+    {
+      "class": "output",
+      "ledger": "4710",
+      "provider": "4720",
+      "delta": "10",
+      "within": true
+    }
+  ],
+  "prices": [
+    {
+      "model": "example-large-1",
+      "tier": "standard",
+      "region": "global",
+      "class": "cache_read",
+      "tokens": "120000",
+      "provider_list": "0.036",
+      "implied_unit_price": "0.3",
+      "catalog_unit_price": "0.3",
+      "sku_price_id": "anthropic/example-large-1/cache_read/standard",
+      "match": true
+    },
+    {
+      "model": "example-large-1",
+      "tier": "standard",
+      "region": "global",
+      "class": "input_uncached",
+      "tokens": "1840",
+      "provider_list": "0.00552",
+      "implied_unit_price": "3",
+      "catalog_unit_price": "3",
+      "sku_price_id": "anthropic/example-large-1/input_uncached/standard",
+      "match": true
+    },
+    {
+      "model": "example-large-1",
+      "tier": "standard",
+      "region": "global",
+      "class": "output",
+      "tokens": "4720",
+      "provider_list": "0.0708",
+      "implied_unit_price": "15",
+      "catalog_unit_price": "15",
+      "sku_price_id": "anthropic/example-large-1/output/standard",
+      "match": true
+    }
+  ],
+  "dollars": {
+    "classes": [
+      {
+        "class": "input_uncached",
+        "ledger": "0.00552",
+        "provider": "0.00552",
+        "delta": "0",
+        "within": true
+      },
+      {
+        "class": "cache_read",
+        "ledger": "0.036",
+        "provider": "0.036",
+        "delta": "0",
+        "within": true
+      },
+      {
+        "class": "output",
+        "ledger": "0.07065",
+        "provider": "0.0708",
+        "delta": "0.00015",
+        "within": true
+      }
+    ],
+    "verdict": "within",
+    "ledger": "0.11217",
+    "provider": "0.11232",
+    "provider_effective": "0.11232",
+    "provider_list": "0.11232",
+    "other_cost": "0",
+    "residual": "0.00015",
+    "causes": [],
+    "unattributed": "0.00015",
+    "rounding": {
+      "currency": "USD",
+      "rows": 12,
+      "variance": "0.00015",
+      "within": true
+    }
+  },
+  "span": null,
+  "notes": []
+}

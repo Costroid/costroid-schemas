@@ -1,0 +1,14 @@
+{
+  "iss": "https://gitlab.com",
+  "aud": "https://app.costroid.com/tenants/org_01JEXAMPLE0001",
+  "iat": 1790841720,
+  "exp": 1790845320,
+  "jti": "example-77d2e4aa",
+  "namespace_id": "4410287",
+  "namespace_path": "example",
+  "project_id": "61200345",
+  "project_path": "example/widgets",
+  "ref": "main",
+  "ref_protected": "true",
+  "pipeline_source": "push"
+}

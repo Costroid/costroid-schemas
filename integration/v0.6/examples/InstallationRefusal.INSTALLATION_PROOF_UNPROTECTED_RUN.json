@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INSTALLATION_PROOF_UNPROTECTED_RUN",
+    "message": "The run that requested this proof could start without the protected branch."
+  }
+}

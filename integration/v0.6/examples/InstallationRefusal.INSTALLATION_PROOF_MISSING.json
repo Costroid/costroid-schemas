@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INSTALLATION_PROOF_MISSING",
+    "message": "The body holds no proof in compact JWS form."
+  }
+}
