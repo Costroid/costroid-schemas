@@ -20,6 +20,7 @@ Open, versioned contracts for [Costroid](https://github.com/Costroid/costroid), 
 | [`result/v0.10`](result/v0.10/README.md)         | One object per Costroid report: as v0.9, plus the infrastructure estimates, stated apart from the figures.                   |
 | [`result/v0.6`](result/v0.6/README.md)           | The same object, before an agent's own figure and two run reasons.                                                           |
 | [`result/v0.5`](result/v0.5/README.md)           | The same object, before the rows' digests and the lifetime total.                                                            |
+| [`integration/v0.6`](integration/v0.6/README.md) | A merge fact graded only from a protected branch and stored with that branch, and repository names compared in lower case.   |
 | [`integration/v0.5`](integration/v0.5/README.md) | One fact per merged pull request, and a reconciliation result per credential and UTC day.                                    |
 | [`integration/v0.4`](integration/v0.4/README.md) | A batch of token_verified rows bound to its run, and the refusal of a restatement from another run.                          |
 | [`integration/v0.3`](integration/v0.3/README.md) | Rows of focus-row/v0.5 and tags of tags/v0.4, and the refusal of a strict-profile row.                                       |
