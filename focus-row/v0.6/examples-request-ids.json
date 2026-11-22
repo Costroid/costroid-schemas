@@ -1,0 +1,6 @@
+{
+  "agent_stream": "req_example_0001",
+  "provider_report": "req_example_0002",
+  "otlp": "req_example_0003",
+  "agent_session_file": "receipt:example-agent:4f1c9a70-2b1e-4c55-9a1d-7be0a3c1d2ef:example-large-1:standard:us"
+}
