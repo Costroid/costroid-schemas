@@ -1,0 +1,11 @@
+{
+  "costroid/repo": "github.com/example/widgets",
+  "costroid/pr": "1423",
+  "costroid/commit_sha": "9f2c6e1ab47d03f58c1e7726d0b4a93e5f618c2d",
+  "costroid/workflow_run_id": "16873409921",
+  "costroid/cost_source": "agent_stream",
+  "costroid/cost_basis": "measured",
+  "costroid/attribution_grade": "exact",
+  "costroid/enforcement_grade": "agent-flag",
+  "costroid/run_identity": "unverified"
+}

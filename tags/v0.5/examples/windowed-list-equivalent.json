@@ -1,0 +1,12 @@
+{
+  "costroid/repo": "gitlab.example.com/platform/billing/api",
+  "costroid/pr": "88",
+  "costroid/agent": "example-agent",
+  "costroid/model": "example-small-1",
+  "costroid/cost_source": "provider_report",
+  "costroid/cost_basis": "list_equivalent",
+  "costroid/attribution_grade": "windowed",
+  "costroid/enforcement_grade": "provider",
+  "costroid/run_identity": "token_verified",
+  "team": "payments"
+}
