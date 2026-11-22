@@ -16,6 +16,7 @@ Open, versioned contracts for [Costroid](https://github.com/Costroid/costroid), 
 | [`focus-row/v0.2`](focus-row/v0.2/README.md)     | The same row, before the 30-minute and 12-hour cache write classes.                                                          |
 | [`focus-row/v0.1`](focus-row/v0.1/README.md)     | The same row, before region and service tier columns.                                                                        |
 | [`status/v0.1`](status/v0.1/README.md)           | What a run has spent while its agent works: spend per basis, cap, grade and counts.                                          |
+| [`receipt/v0.1`](receipt/v0.1/README.md)         | The token counts of a developer's own agent sessions on one branch, posted on the pull request. It states no amount.         |
 | [`result/v0.7`](result/v0.7/README.md)           | One object per Costroid report: its figures, the rows it was built from, the pull request's total and an agent's own figure. |
 | [`result/v0.8`](result/v0.8/README.md)           | One object per Costroid report: as v0.7, plus the recorded run a report shows in place of the pull request's own.            |
 | [`result/v0.9`](result/v0.9/README.md)           | One object per Costroid report: as v0.8, plus the figures OpenCode and Copilot CLI state, each in its own unit.              |
