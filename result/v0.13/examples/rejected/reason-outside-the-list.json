@@ -1,0 +1,98 @@
+{
+  "schema": "costroid.result/0.13",
+  "conclusion": null,
+  "state": "no_rows",
+  "reason": "agent_crashed",
+  "agent_error": null,
+  "agent_skipped": null,
+  "head_sha": "",
+  "ci_run": null,
+  "rows_sha256": null,
+  "rows_file_sha256": null,
+  "amounts": "shown",
+  "rows": 0,
+  "run_identity": "unverified",
+  "figures": [],
+  "figures_omitted": 0,
+  "cap": {
+    "currency": "USD",
+    "amount": "5",
+    "enforcement_grade": null,
+    "cost": null,
+    "cost_basis": null,
+    "remainder": null,
+    "overshoot": null,
+    "overshoot_tokens": null
+  },
+  "data": {
+    "agents": [],
+    "models": [],
+    "models_omitted": 0,
+    "catalog_versions": [],
+    "fallback_models": [],
+    "fallback_models_omitted": 0,
+    "fallback_price_ids": [],
+    "fallback_price_ids_omitted": 0
+  },
+  "lifetime": null,
+  "agent_stated": null,
+  "recorded": null,
+  "estimates": [
+    {
+      "source": "infrastructure",
+      "reason": "no_file"
+    }
+  ],
+  "estimates_omitted": 0,
+  "policy": {
+    "conclusion": "neutral",
+    "trust": "unverified",
+    "pack_sha256": "0a36ca52cf9123f580e21c44a00d804f62558b6c0f96179917521684e70c3f30",
+    "config_sha256": "d3cbc6bf0befd44c89f0089e36ad6998cc03013cd13de8e31bf49846be83d364",
+    "config_ref": "1111111111111111111111111111111111111111",
+    "config": "found",
+    "config_from_base": true,
+    "evaluated_at": "2026-11-20T09:00:00Z",
+    "warn_only": {
+      "active": false,
+      "reason": "ended",
+      "started": "2026-11-02T09:00:00Z",
+      "ends": "2026-11-09T09:00:00Z"
+    },
+    "results": [
+      {
+        "rule": "run_p95",
+        "outcome": "unproven",
+        "reason": "no_baseline",
+        "limit_factor": "1.5",
+        "baseline_runs": 7
+      }
+    ],
+    "pack": {
+      "path": ".costroid/policy.rego",
+      "sha256": "fd234a9085f3d8c077d02dc60067ae40824b66a8d8155a9d9df38dd635cbf218",
+      "results": []
+    },
+    "joinable_rows": 0
+  },
+  "receipts": [
+    {
+      "comment": {
+        "id": 2471000001,
+        "created_at": "2026-11-20T16:42:07Z",
+        "sha256": "09a3ca8ff98a5921fc951e52265e8de2ef3739115f1603dfc09c44171906df13"
+      },
+      "sessions": 2,
+      "first_day": "2026-11-18",
+      "last_day": "2026-11-20",
+      "figures": [
+        {
+          "currency": "USD",
+          "cost_basis": "list_equivalent",
+          "list_cost": "11.4619213",
+          "rows": 12
+        }
+      ]
+    }
+  ]
+}

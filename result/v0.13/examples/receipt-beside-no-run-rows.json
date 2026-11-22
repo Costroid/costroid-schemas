@@ -1,0 +1,61 @@
+{
+  "schema": "costroid.result/0.13",
+  "conclusion": null,
+  "state": "no_rows",
+  "reason": "empty_rows_file",
+  "run_reason": "no_usage",
+  "agent_error": null,
+  "agent_skipped": null,
+  "head_sha": "",
+  "ci_run": null,
+  "rows_sha256": null,
+  "rows_file_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "amounts": "shown",
+  "rows": 0,
+  "run_identity": "unverified",
+  "figures": [],
+  "figures_omitted": 0,
+  "cap": {
+    "currency": "USD",
+    "amount": "5",
+    "enforcement_grade": null,
+    "cost": null,
+    "cost_basis": null,
+    "remainder": null,
+    "overshoot": null,
+    "overshoot_tokens": null
+  },
+  "data": {
+    "agents": [],
+    "models": [],
+    "models_omitted": 0,
+    "catalog_versions": [],
+    "fallback_models": [],
+    "fallback_models_omitted": 0,
+    "fallback_price_ids": [],
+    "fallback_price_ids_omitted": 0
+  },
+  "lifetime": null,
+  "agent_stated": null,
+  "recorded": null,
+  "receipts": [
+    {
+      "comment": {
+        "id": 2471000001,
+        "created_at": "2026-11-20T16:42:07Z",
+        "sha256": "09a3ca8ff98a5921fc951e52265e8de2ef3739115f1603dfc09c44171906df13"
+      },
+      "sessions": 2,
+      "first_day": "2026-11-18",
+      "last_day": "2026-11-20",
+      "figures": [
+        {
+          "currency": "USD",
+          "cost_basis": "list_equivalent",
+          "list_cost": "11.4619213",
+          "rows": 12
+        }
+      ]
+    }
+  ]
+}
