@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "RECONCILIATION_INVALID",
+    "message": "A line is not a row of this version."
+  }
+}

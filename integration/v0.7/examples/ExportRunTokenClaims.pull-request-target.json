@@ -1,0 +1,17 @@
+{
+  "iss": "https://token.actions.githubusercontent.com",
+  "aud": "https://app.costroid.com/tenants/org_01JEXAMPLE0001/rows",
+  "iat": 1791970800,
+  "exp": 1791971100,
+  "jti": "example-1e5b9c30",
+  "sub": "repo:example/widgets:pull_request",
+  "repository": "example/widgets",
+  "repository_id": "903114",
+  "repository_owner": "example",
+  "repository_owner_id": "7204411",
+  "run_id": "16873421764",
+  "run_attempt": "1",
+  "sha": "2d7c41e90b8fa365c1e04d9b7a26f3e58c0d1b94",
+  "ref": "refs/heads/main",
+  "event_name": "pull_request_target"
+}

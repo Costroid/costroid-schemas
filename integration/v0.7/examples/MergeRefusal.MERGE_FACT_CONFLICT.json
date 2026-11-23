@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "MERGE_FACT_CONFLICT",
+    "message": "github.com/example/widgets pull request 1482 already holds a different fact."
+  }
+}

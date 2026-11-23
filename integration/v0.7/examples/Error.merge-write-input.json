@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "TOOL_INPUT_INVALID",
+    "message": "The merge id in the path is malformed, or Costroid-Installation-Id is missing or malformed, including when a Costroid-Run-Token is sent without it."
+  }
+}

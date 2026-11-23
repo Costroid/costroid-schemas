@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "MERGE_FACT_NOT_FOUND",
+    "message": "This tenant holds no such merge_id."
+  }
+}

@@ -9,6 +9,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const VERSION_DIRECTORY = /^v\d+\.\d+$/
 const SCHEMA_BASE = 'https://raw.githubusercontent.com/Costroid/costroid-schemas/main/'
 const PROOF_AUDIENCE_BASE = 'https://app.costroid.com/tenants/'
+const GITHUB_ISSUER = 'https://token.actions.githubusercontent.com'
 const PROOF_WINDOW_SECONDS = 600
 const CLOCK_SKEW_SECONDS = 60
 const CI_PROOF_CURRENT_SECONDS = 7 * 24 * 60 * 60
@@ -155,15 +156,17 @@ function provenSubject(claims) {
   return { id: claims.sub, kind: 'app_attestation' }
 }
 
+function outsideWindow(claims, now) {
+  const lastValid = Math.min(claims.exp, claims.iat + PROOF_WINDOW_SECONDS)
+  return now > lastValid + CLOCK_SKEW_SECONDS || claims.iat > now + CLOCK_SKEW_SECONDS
+}
+
 function proofRefusal(binding, subject) {
   const { claims } = binding
-  const now = unixSeconds(binding.at)
-  const lastValid = Math.min(claims.exp, claims.iat + PROOF_WINDOW_SECONDS)
   if (!binding.keys_available) return 'INSTALLATION_PROOF_KEYS_UNAVAILABLE'
   if (claims.aud !== PROOF_AUDIENCE_BASE + binding.tenant_id)
     return 'INSTALLATION_PROOF_AUDIENCE_MISMATCH'
-  if (now > lastValid + CLOCK_SKEW_SECONDS || claims.iat > now + CLOCK_SKEW_SECONDS)
-    return 'INSTALLATION_PROOF_EXPIRED'
+  if (outsideWindow(claims, unixSeconds(binding.at))) return 'INSTALLATION_PROOF_EXPIRED'
   if (subject.id !== binding.installation_id) return 'INSTALLATION_PROOF_SUBJECT_MISMATCH'
   return null
 }
@@ -196,11 +199,152 @@ function bindingAnswer(binding) {
     : { refusal: 'INSTALLATION_BOUND_ELSEWHERE', effect: null }
 }
 
-function bindingCaseProblems(binding) {
-  const answer = bindingAnswer(binding)
-  if (answer.refusal !== binding.refusal || answer.effect !== binding.effect)
+const refused = (refusal) => ({ refusal, effect: null })
+const sameStrings = (left, right, keys) => keys.every((key) => left[key] === right[key])
+
+function credentialAudience({ tenant_id: tenant, write, key_id: key, body }) {
+  const spend = write === 'spend' ? '/spend' : ''
+  return `${PROOF_AUDIENCE_BASE}${tenant}/credentials/${key}/${body.run_id}/${body.run_attempt}${spend}`
+}
+
+function credentialStatement({ key_id: key, body, claims }) {
+  return {
+    key_id: key,
+    repo: `github.com/${claims.repository}`.toLowerCase(),
+    ...body,
+    attested_by: { run_id: claims.run_id, run_attempt: claims.run_attempt, ref: claims.ref },
+  }
+}
+
+const sameAttestingRun = (held, statement) =>
+  held.repo === statement.repo &&
+  sameStrings(held.attested_by, statement.attested_by, ['run_id', 'run_attempt'])
+
+function attestationAnswer(statement, { attestations }) {
+  const ofThisRun = attestations.filter((held) => sameAttestingRun(held, statement))
+  const attestedFor = ['key_id', 'run_id', 'run_attempt', 'head_sha']
+  if (ofThisRun.some((held) => sameStrings(held, statement, attestedFor)))
+    return { refusal: null, effect: 'unchanged' }
+  if (ofThisRun.length > 0) return refused('CREDENTIAL_ATTESTING_RUN_USED')
+  if (attestations.some((held) => held.key_id === statement.key_id))
+    return refused('CREDENTIAL_ATTESTED_ELSEWHERE')
+  return { refusal: null, effect: 'stored' }
+}
+
+function spendAnswer(statement, { attestations, spends }) {
+  const attestedFor = ['key_id', 'repo', 'run_id', 'run_attempt']
+  if (!attestations.some((held) => sameStrings(held, statement, attestedFor)))
+    return refused('CREDENTIAL_NOT_ATTESTED')
+  const held = spends.find((spend) => spend.key_id === statement.key_id)
+  if (held === undefined) return { refusal: null, effect: 'stored' }
+  return sameStrings(held, statement, ['run_id', 'run_attempt', 'spend'])
+    ? { refusal: null, effect: 'unchanged' }
+    : refused('CREDENTIAL_SPEND_HELD')
+}
+
+const BODY_BYTES = 16384
+
+function credentialInputValid(vector, schemaNamed) {
+  const { body } = vector
+  const bodySchema =
+    vector.write === 'attestation' ? 'CredentialAttestationBody' : 'CredentialSpendBody'
+  return (
+    schemaNamed('KeyId')(vector.key_id) &&
+    Buffer.byteLength(JSON.stringify(body), 'utf8') <= BODY_BYTES &&
+    schemaNamed(bodySchema)(body)
+  )
+}
+
+const GITHUB_INSTALLATION = /^github(-owner)?:/
+
+function runTokenRefusal(vector, schemaNamed) {
+  const { claims, installation } = vector
+  if (claims.iss !== GITHUB_ISSUER) return 'RUN_TOKEN_INVALID'
+  if (!GITHUB_INSTALLATION.test(installation.id)) return 'RUN_TOKEN_OWNER_MISMATCH'
+  if (!vector.keys_available) return 'INSTALLATION_PROOF_KEYS_UNAVAILABLE'
+  if (
+    !vector.signature_verifies ||
+    !schemaNamed('CredentialVerifiedClaims')(claims) ||
+    claims.aud !== credentialAudience(vector) ||
+    outsideWindow(claims, unixSeconds(vector.at))
+  )
+    return 'RUN_TOKEN_INVALID'
+  if (claims.repository_owner_id !== installation.owner_id) return 'RUN_TOKEN_OWNER_MISMATCH'
+  if (!schemaNamed('WorkflowRunEvent')(claims)) return 'CREDENTIAL_RUN_UNPROTECTED'
+  if (!schemaNamed('ProtectedBranchClaims')(claims)) return 'CREDENTIAL_RUN_UNPROTECTED'
+  return null
+}
+
+function credentialAnswer(vector, schemaNamed) {
+  const scope = schemaNamed('Scope')
+  if (!vector.scopes.some((name) => scope(name))) return refused('AUTH_TOKEN_SCOPE')
+  if (!credentialInputValid(vector, schemaNamed)) return refused('TOOL_INPUT_INVALID')
+  if (!vector.scopes.includes('credentials:write')) return refused('AUTH_TOKEN_SCOPE')
+  if (!vector.installation.bound) return refused('INSTALLATION_NOT_BOUND')
+  const tokenRefusal = runTokenRefusal(vector, schemaNamed)
+  if (tokenRefusal !== null) return refused(tokenRefusal)
+  const statement = credentialStatement(vector)
+  return vector.write === 'attestation'
+    ? attestationAnswer(statement, vector.held)
+    : spendAnswer(statement, vector.held)
+}
+
+function pullRequestOf(run) {
+  if (run.event_name !== 'pull_request') return undefined
+  return /^refs\/pull\/([1-9][0-9]*)\/merge$/.exec(run.ref)?.[1]
+}
+
+const STATED_KEY = /"((?:[^"\\]|\\.)*)"\s*:/g
+
+function namesAKeptKeyTwice(cell) {
+  const kept = [...cell.matchAll(STATED_KEY)]
+    .map(([, key]) => key)
+    .filter((key) => key.startsWith('costroid/'))
+  return new Set(kept).size !== kept.length
+}
+
+function ingestAnswer({ run, rows }) {
+  const cells = rows.map((row) => (typeof row === 'string' ? row : JSON.stringify(row)))
+  const tags = cells.map((cell) => JSON.parse(cell))
+  if (tags.some((row) => 'costroid/origin' in row)) return refused('ROW_ORIGIN_REFUSED')
+  const verified = tags.filter((row) => row['costroid/run_identity'] === 'token_verified')
+  if (cells.some(namesAKeptKeyTwice)) return refused('UNPARSEABLE_FILE')
+  if (verified.length > 0 && run === null) return refused('RUN_TOKEN_MISSING')
+  if (run === null) return { refusal: null, effect: 'ingested' }
+  const repo = `github.com/${run.repository}`.toLowerCase()
+  const pullRequest = pullRequestOf(run)
+  const mismatch = verified.some(
+    (row) =>
+      row['costroid/workflow_run_id'] !== run.run_id ||
+      row['costroid/repo'] !== repo ||
+      (pullRequest !== undefined && row['costroid/pr'] !== pullRequest),
+  )
+  return mismatch ? refused('ROW_IDENTITY_MISMATCH') : { refusal: null, effect: 'ingested' }
+}
+
+function restatementAnswer({ held, run }) {
+  const sameRun =
+    run !== null &&
+    held.run !== null &&
+    run.repository.toLowerCase() === held.run.repository.toLowerCase() &&
+    sameStrings(run, held.run, ['run_id', 'run_attempt'])
+  return !held.token_verified || sameRun
+    ? { refusal: null, effect: 'restated' }
+    : refused('EXPORT_BATCH_RUN_BOUND')
+}
+
+const CASE_RULES = new Map([
+  ['BindingCase', bindingAnswer],
+  ['CredentialCase', credentialAnswer],
+  ['RestatementCase', restatementAnswer],
+  ['IngestCase', ingestAnswer],
+])
+
+function caseProblems(rule, vector, schemaNamed) {
+  const answer = rule(vector, schemaNamed)
+  if (answer.refusal !== vector.refusal || answer.effect !== vector.effect)
     throw new Error(
-      `the rules answer ${answer.refusal ?? answer.effect}, the example states ${binding.refusal ?? binding.effect}`,
+      `the rules answer ${answer.refusal ?? answer.effect}, the example states ${vector.refusal ?? vector.effect}`,
     )
   return answer.refusal === null ? [] : [answer.refusal]
 }
@@ -211,21 +355,24 @@ const describeErrors = (errors) =>
     .map((error) => `${error.instancePath || '/'} ${error.message}`)
     .join('; ')
 
-function problemsWith(validate, path, contract, requestIds) {
+function problemsWith(validate, path, contract, requestIds, schemaNamed) {
   const problems = []
+  const rule = CASE_RULES.get(basename(path).split('.')[0])
   for (const [index, instance] of instancesOf(path).entries()) {
     if (!validate(instance)) problems.push(`item ${index + 1}: ${describeErrors(validate.errors)}`)
     else if (contract === 'focus-row')
       problems.push(
         ...focusRowProblems(instance, requestIds).map((problem) => `item ${index + 1}: ${problem}`),
       )
-    else if (basename(path).startsWith('BindingCase.'))
-      problems.push(...bindingCaseProblems(instance).map((code) => `item ${index + 1}: ${code}`))
+    else if (rule !== undefined)
+      problems.push(
+        ...caseProblems(rule, instance, schemaNamed).map((code) => `item ${index + 1}: ${code}`),
+      )
   }
   return problems
 }
 
-function checkExamples(directory, validatorFor) {
+function checkExamples(directory, validatorFor, schemaNamed) {
   const contract = basename(dirname(directory))
   const requestIds =
     contract === 'focus-row' ? readJson(join(directory, 'examples-request-ids.json')) : undefined
@@ -233,7 +380,7 @@ function checkExamples(directory, validatorFor) {
   if (accepted.length === 0) report(directory, 'no examples')
   for (const path of accepted) {
     try {
-      const problems = problemsWith(validatorFor(path), path, contract, requestIds)
+      const problems = problemsWith(validatorFor(path), path, contract, requestIds, schemaNamed)
       if (problems.length > 0) report(path, problems.join(' | '))
       else pass(path, 'accepted')
     } catch (error) {
@@ -242,7 +389,7 @@ function checkExamples(directory, validatorFor) {
   }
   for (const path of exampleFiles(join(directory, 'examples', 'rejected'))) {
     try {
-      const problems = problemsWith(validatorFor(path), path, contract, requestIds)
+      const problems = problemsWith(validatorFor(path), path, contract, requestIds, schemaNamed)
       if (problems.length === 0) report(path, 'a rejected example was accepted')
       else pass(path, `rejected: ${problems[0]}`)
     } catch (error) {
@@ -301,6 +448,41 @@ function checkRefusalCoverage(directory, document) {
   }
 }
 
+const README_CODE_ROW = /^\| `([A-Z][A-Z0-9_]*)` +\| [1-5][0-9]{2} +\| (.+?) +\|$/
+const FIRST_VERSION_WORDED_ONCE = [0, 7]
+
+function wordsEachCodeOnce(version) {
+  const [major, minor] = version.split('.').map(Number)
+  const [firstMajor, firstMinor] = FIRST_VERSION_WORDED_ONCE
+  return major > firstMajor || (major === firstMajor && minor >= firstMinor)
+}
+
+function descriptionsOf(node) {
+  if (typeof node !== 'object' || node === null) return []
+  return Object.entries(node).flatMap(([key, value]) =>
+    key === 'description' && typeof value === 'string' ? [value] : descriptionsOf(value),
+  )
+}
+
+const plainMeaning = (cell) => cell.replaceAll('`', '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+const lowerFirst = (text) => text.charAt(0).toLowerCase() + text.slice(1)
+
+function checkCodeWordings(directory, document) {
+  if (!wordsEachCodeOnce(document.info.version)) return
+  const readme = readFileSync(join(directory, 'README.md'), 'utf8')
+  const descriptions = descriptionsOf([document.paths, document.components.responses]).join('\n')
+  for (const line of readme.split('\n')) {
+    const row = README_CODE_ROW.exec(line)
+    if (row === null) continue
+    const [, code, cell] = row
+    const meaning = plainMeaning(cell)
+    const worded = [meaning, lowerFirst(meaning)].some((text) =>
+      descriptions.includes(`${code}: ${text}.`),
+    )
+    if (!worded) report(directory, `${code}: openapi.json does not word it as the README does`)
+  }
+}
+
 const directories = versionDirectories()
 if (directories.length === 0) {
   console.error('FAIL no contract directories')
@@ -335,13 +517,16 @@ function checkContract(directory) {
     for (const name of Object.keys(document.components.schemas))
       ajv.getSchema(`${id}#/components/schemas/${name}`)
     pass(openApiPath, `${Object.keys(document.components.schemas).length} schemas compiled`)
-    checkExamples(directory, (path) => {
+    const schemaNamed = (component) => ajv.getSchema(`${id}#/components/schemas/${component}`)
+    const validatorFor = (path) => {
       const component = basename(path).split('.')[0]
-      const validate = ajv.getSchema(`${id}#/components/schemas/${component}`)
+      const validate = schemaNamed(component)
       if (validate === undefined) throw new Error(`no component schema named ${component}`)
       return validate
-    })
+    }
+    checkExamples(directory, validatorFor, schemaNamed)
     checkRefusalCoverage(directory, document)
+    checkCodeWordings(directory, document)
   } else {
     const id = schemaFiles.get(directory)
     if (id === undefined) throw new Error('no schema')

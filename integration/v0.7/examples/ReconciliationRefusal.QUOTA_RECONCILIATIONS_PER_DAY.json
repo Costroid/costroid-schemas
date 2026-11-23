@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "QUOTA_RECONCILIATIONS_PER_DAY",
+    "message": "This body would pass the tenant's reconciliations_per_day limit."
+  }
+}

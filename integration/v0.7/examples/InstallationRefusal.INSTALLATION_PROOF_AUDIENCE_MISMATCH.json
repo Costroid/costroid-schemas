@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INSTALLATION_PROOF_AUDIENCE_MISMATCH",
+    "message": "The proof is for another tenant."
+  }
+}

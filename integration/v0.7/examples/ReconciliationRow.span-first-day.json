@@ -1,0 +1,66 @@
+{
+  "source": "anthropic",
+  "credential": "svac_01Example",
+  "day": "2026-11-15",
+  "state": "matched",
+  "final": false,
+  "data_refreshed_at": "2026-11-17T06:00:00Z",
+  "currency": "USD",
+  "tokens": [
+    {
+      "class": "output",
+      "ledger": "9000",
+      "provider": "9000",
+      "delta": "0",
+      "within": true
+    }
+  ],
+  "prices": [
+    {
+      "model": "example-large-1",
+      "tier": "standard",
+      "region": "global",
+      "class": "output",
+      "tokens": "8500",
+      "provider_list": "0.1275",
+      "implied_unit_price": "15",
+      "catalog_unit_price": "15",
+      "sku_price_id": "anthropic/example-large-1/output/standard",
+      "match": true
+    }
+  ],
+  "dollars": {
+    "classes": [
+      {
+        "class": "output",
+        "ledger": "0.135",
+        "provider": "0.135",
+        "delta": "0",
+        "within": true
+      }
+    ],
+    "verdict": "within",
+    "ledger": "0.135",
+    "provider": "0.135",
+    "provider_effective": "0.135",
+    "provider_list": "0.135",
+    "other_cost": "0",
+    "residual": "0",
+    "causes": [],
+    "unattributed": "0",
+    "rounding": {
+      "currency": "USD",
+      "rows": 1,
+      "variance": "0",
+      "within": true
+    }
+  },
+  "span": {
+    "cause": "run_spans_days",
+    "from": "2026-11-15",
+    "to": "2026-11-16"
+  },
+  "notes": [
+    "a run crossed midnight UTC: the ledger dates its tokens by its start, and the provider by when each request was served, so 2026-11-15 to 2026-11-16 are compared as one, for tokens and dollars, and every class matched within 1%"
+  ]
+}

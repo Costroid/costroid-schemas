@@ -1,0 +1,37 @@
+{
+  "run": {
+    "iss": "https://token.actions.githubusercontent.com",
+    "aud": "https://app.costroid.com/tenants/org_01JEXAMPLE0001/rows",
+    "iat": 1791970800,
+    "exp": 1791971100,
+    "jti": "example-7c41d2e9",
+    "sub": "repo:example/widgets:pull_request",
+    "repository": "example/widgets",
+    "repository_id": "903114",
+    "repository_owner": "example",
+    "repository_owner_id": "7204411",
+    "run_id": "16873409921",
+    "run_attempt": "1",
+    "sha": "5b0e2f7c1d9a84e36f2c0b1a7d4e9f3c8a6b2d10",
+    "ref": "refs/pull/1423/merge",
+    "event_name": "pull_request"
+  },
+  "rows": [
+    "{\"costroid/repo\":\"github.com/example/widgets\",\"costroid/pr\":\"1423\",\"costroid/commit_sha\":\"4b1e0c9d27f35a86e01c7d4f98b2a6e3c5d70f12\",\"costroid/workflow_run_id\":\"16873409921\",\"costroid/agent\":\"example-agent\",\"costroid/model\":\"example-large-1\",\"costroid/cost_source\":\"agent_stream\",\"costroid/cost_basis\":\"measured\",\"costroid/attribution_grade\":\"exact\",\"costroid/enforcement_grade\":\"gateway-precheck\",\"costroid/run_identity\":\"token_verified\",\"costroid/pr\":\"1499\"}",
+    {
+      "costroid/repo": "github.com/example/widgets",
+      "costroid/pr": "1424",
+      "costroid/commit_sha": "4b1e0c9d27f35a86e01c7d4f98b2a6e3c5d70f12",
+      "costroid/workflow_run_id": "16873409921",
+      "costroid/agent": "example-agent",
+      "costroid/model": "example-large-1",
+      "costroid/cost_source": "agent_stream",
+      "costroid/cost_basis": "measured",
+      "costroid/attribution_grade": "exact",
+      "costroid/enforcement_grade": "gateway-precheck",
+      "costroid/run_identity": "token_verified"
+    }
+  ],
+  "refusal": "UNPARSEABLE_FILE",
+  "effect": null
+}

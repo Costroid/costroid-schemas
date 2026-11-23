@@ -1,0 +1,9 @@
+{
+  "merge_id": "gitlab-61500233-77",
+  "repo": "gitlab.com/example/gadgets",
+  "pull_request": 77,
+  "merged_at": "2026-11-20T16:22:04Z",
+  "merge_commit_sha": "c0e4a91d27b3f58e6a0d4c19b7e2f3a8d5c6b140",
+  "run_identity": "unverified",
+  "ref": null
+}

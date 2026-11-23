@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INSTALLATION_PROOF_BAD",
+    "message": "A code outside the closed list."
+  }
+}

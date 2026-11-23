@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "TOOL_INPUT_INVALID",
+    "message": "The merge id in the path is malformed."
+  }
+}

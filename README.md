@@ -26,6 +26,7 @@ Open, versioned contracts for [Costroid](https://github.com/Costroid/costroid), 
 | [`result/v0.13`](result/v0.13/README.md)         | One object per Costroid report: as v0.12, plus the developer-machine sessions a receipt states, apart from the figures.      |
 | [`result/v0.6`](result/v0.6/README.md)           | The same object, before an agent's own figure and two run reasons.                                                           |
 | [`result/v0.5`](result/v0.5/README.md)           | The same object, before the rows' digests and the lifetime total.                                                            |
+| [`integration/v0.7`](integration/v0.7/README.md) | A gateway key attested by a protected run, its spend, and the pull request read from the run token.                          |
 | [`integration/v0.6`](integration/v0.6/README.md) | A merge fact graded only from a protected branch and stored with that branch, and repository names compared in lower case.   |
 | [`integration/v0.5`](integration/v0.5/README.md) | One fact per merged pull request, and a reconciliation result per credential and UTC day.                                    |
 | [`integration/v0.4`](integration/v0.4/README.md) | A batch of token_verified rows bound to its run, and the refusal of a restatement from another run.                          |

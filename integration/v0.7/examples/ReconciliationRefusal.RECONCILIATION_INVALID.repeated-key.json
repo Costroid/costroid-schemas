@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "RECONCILIATION_INVALID",
+    "message": "Line 5 repeats the key of an earlier line.",
+    "line": 5
+  }
+}

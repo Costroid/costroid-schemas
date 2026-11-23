@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "EXPORT_BATCH_RUN_BOUND",
+    "message": "This batch holds token_verified rows, and this request may not restate it."
+  }
+}

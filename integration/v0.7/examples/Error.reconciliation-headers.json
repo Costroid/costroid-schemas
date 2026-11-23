@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "TOOL_INPUT_INVALID",
+    "message": "A header is missing or malformed, including a Costroid-Run-Token sent without Costroid-Installation-Id."
+  }
+}

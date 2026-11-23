@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "TOOL_INPUT_INVALID",
+    "message": "A query parameter is missing or malformed, to is before from, or the range spans more than max_reconciliation_range_days days."
+  }
+}

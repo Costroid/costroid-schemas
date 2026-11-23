@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "PLAN_WRITES_REFUSED",
+    "message": "This version has no refusal for a plan."
+  }
+}

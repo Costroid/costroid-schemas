@@ -1,0 +1,16 @@
+{
+  "source": "anthropic",
+  "credential": "apikey_01Example",
+  "day": "2026-11-20",
+  "state": "pending",
+  "final": false,
+  "data_refreshed_at": "2026-11-20T15:30:11Z",
+  "currency": "USD",
+  "tokens": null,
+  "prices": null,
+  "dollars": null,
+  "span": null,
+  "notes": [
+    "the provider has not finished reporting this day"
+  ]
+}

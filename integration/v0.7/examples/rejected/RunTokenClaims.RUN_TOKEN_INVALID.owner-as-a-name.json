@@ -1,0 +1,17 @@
+{
+  "iss": "https://token.actions.githubusercontent.com",
+  "aud": "https://app.costroid.com/tenants/org_01JEXAMPLE0001/rows",
+  "iat": 1791970800,
+  "exp": 1791971100,
+  "jti": "example-7c41d2e9",
+  "sub": "repo:example/widgets:pull_request",
+  "repository": "example/widgets",
+  "repository_id": "903114",
+  "repository_owner": "example",
+  "repository_owner_id": "example",
+  "run_id": "16873409921",
+  "run_attempt": "1",
+  "sha": "5b0e2f7c1d9a84e36f2c0b1a7d4e9f3c8a6b2d10",
+  "ref": "refs/pull/1423/merge",
+  "event_name": "pull_request"
+}

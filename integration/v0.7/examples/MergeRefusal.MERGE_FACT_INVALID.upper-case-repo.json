@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "MERGE_FACT_INVALID",
+    "message": "repo github.com/Example/widgets holds an upper-case letter. Send it in lower case: github.com/example/widgets."
+  }
+}

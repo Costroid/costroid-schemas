@@ -1,0 +1,14 @@
+{
+  "batch_id": "903114-16873409921-1",
+  "held": {
+    "token_verified": true,
+    "run": {
+      "repository": "example/widgets",
+      "run_id": "16873409921",
+      "run_attempt": "1"
+    }
+  },
+  "run": null,
+  "refusal": "EXPORT_BATCH_RUN_BOUND",
+  "effect": null
+}
