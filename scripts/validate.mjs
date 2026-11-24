@@ -355,11 +355,32 @@ const describeErrors = (errors) =>
     .map((error) => `${error.instancePath || '/'} ${error.message}`)
     .join('; ')
 
+const FIRST_RESULT_WITH_DEMOTION = [0, 14]
+
+function holdsDemotion(path) {
+  const [contract, version] = relative(ROOT, path).split('/')
+  if (contract !== 'result') return false
+  const [major, minor] = version.slice(1).split('.').map(Number)
+  const [firstMajor, firstMinor] = FIRST_RESULT_WITH_DEMOTION
+  return major > firstMajor || (major === firstMajor && minor >= firstMinor)
+}
+
+// The schema has already held both instants to YYYY-MM-DDTHH:MM:SSZ, so their text sorts as time does.
+function demotionProblems(result) {
+  const evaluated = result.policy?.evaluated_at
+  return (result.policy?.results ?? [])
+    .filter((entry) => entry.demoted !== undefined && !(entry.demoted.until > evaluated))
+    .map((entry) => `${entry.rule}: demoted.until is not after policy.evaluated_at`)
+}
+
 function problemsWith(validate, path, contract, requestIds, schemaNamed) {
   const problems = []
   const rule = CASE_RULES.get(basename(path).split('.')[0])
+  const demotion = holdsDemotion(path)
   for (const [index, instance] of instancesOf(path).entries()) {
     if (!validate(instance)) problems.push(`item ${index + 1}: ${describeErrors(validate.errors)}`)
+    else if (demotion)
+      problems.push(...demotionProblems(instance).map((problem) => `item ${index + 1}: ${problem}`))
     else if (contract === 'focus-row')
       problems.push(
         ...focusRowProblems(instance, requestIds).map((problem) => `item ${index + 1}: ${problem}`),
